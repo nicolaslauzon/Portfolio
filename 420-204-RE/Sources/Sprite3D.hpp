@@ -14,7 +14,8 @@ protected:
 	unsigned textureId_;
 	unsigned int currentNumberOfFrames_;
 	unsigned int numberOfFrames_;
-
+	double delay_;
+	double animTime_;
 public:
 
 	Sprite3D(Sprite3D* sprite, unsigned int numberOfFrames) {
@@ -24,6 +25,8 @@ public:
 		currentNumberOfFrames_ = sprite->currentNumberOfFrames_;
 		currentFrame_ = sprite->currentFrame_;
 		textureId_ = sprite->textureId_;
+		delay_ = sprite->delay_;
+		animTime_ = 0.0;
 	}
 
 
@@ -32,6 +35,32 @@ public:
 		modelListe_ = new TexturedMesh*[numberOfFrames];
 		currentNumberOfFrames_ = 0;
 		currentFrame_ = 0;
+	}
+
+	inline void SetDelay(double delay) {
+		delay_ = delay;
+	}
+
+	inline double GetDelay() {
+		return delay_;
+	}
+
+	void UpdateFrame(double deltatime) {
+
+		if (delay_) {
+			animTime_ += deltatime;
+			if (animTime_ > delay_) {
+				SetNextFrame();
+				animTime_ = 0;
+			}
+		}
+	}
+
+
+	void Transform(Matrix44d matrix) {
+		for (int i = 0; i < numberOfFrames_; i++) {
+			modelListe_[i]->Transform(matrix);
+		}
 	}
 
 	void SetModel(unsigned int modelFrame){
@@ -56,10 +85,6 @@ public:
 		}
 	}
 
-	void ResetFrame() {
-		currentFrame_ = 0;
-	}
-
 	void SetNextFrame() {
 		if (currentFrame_ < numberOfFrames_-1)
 			currentFrame_++;
@@ -74,11 +99,7 @@ public:
 		}
 	}
 
-	void Transform(Matrix44d matrix) {
-		for (int i = 0; i < numberOfFrames_; i++) {
-			modelListe_[i]->Transform(matrix);
-		}
-	}
+	
 	
 	
 	TexturedMesh* getFrame(unsigned int frame) {

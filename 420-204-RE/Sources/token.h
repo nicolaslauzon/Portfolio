@@ -9,7 +9,7 @@ public:
     c_Token();
     c_Token(const c_Token& token);
 
-    enum c_TokenTyoe {
+    enum c_TokenType {
         kUnknownTokenType=0,
         kMultiplyTokenType=1,
         kDivideTokenType=2,
@@ -25,10 +25,10 @@ public:
 
     static c_Token BuildFromString(const std::string& string,bool *is_ok=nullptr);
 
-    c_TokenTyoe Type() const { return token_type_;}
+    c_TokenType Type() const { return token_type_;}
     const std::string& ValueString() const { return value_string_;}
 private:
-    c_TokenTyoe token_type_;
+    c_TokenType token_type_;
     std::string value_string_;
 };
 

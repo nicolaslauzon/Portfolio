@@ -11,7 +11,7 @@
 #include "Observer.hpp"
 #include "Character.hpp"
 
-#define BASEDISTANCE 20.0
+#define BASEDISTANCE 10.0
 #define SPEEDMODIFIER 20.0
 
 ///\class StaticCamera
@@ -64,12 +64,13 @@ class DynamicCamera : public StaticCamera {
 private:
     Character* character_; ///< Personnage suivi par la caméra
     double speed_; ///< Vitesse à laquelle la caméra se déplace
+    double previousDistance_;
 
 public:
     ///\param character Personnage suivi par la caméra
-    DynamicCamera(Character* character) : StaticCamera(Vector3d(0.0, 1.0, 0.0), character->GetCoordinates().GetOrigin() - character->GetCoordinates().GetXDirection() * BASEDISTANCE + Vector3d(0.0, 7.0, 0.0), character->GetCoordinates().GetOrigin()) {
+    DynamicCamera(Character* character) : StaticCamera(Vector3d(0.0, 1.0, 0.0), character->GetCoordinates().GetOrigin() - character->GetCoordinates().GetXDirection() * BASEDISTANCE + Vector3d(0.0, 5.0, 0.0), character->GetCoordinates().GetOrigin()) {
         character_ = character;
-        speed_ = 0.0;
+        speed_ = previousDistance_ = 0.0;
     }
 
     ///\brief Effectue le d�placement de la cam�ra
@@ -77,13 +78,15 @@ public:
     void Move(double deltaT) {
         target_ = character_->GetCoordinates().GetOrigin();
 
-        // Rotation de la position de la caméra
+        /* Rotation de la position de la caméra
         Matrix44d rotMatrix;
-        rotMatrix.LoadRotation({ 0.0, 1.0, 0.0 }, 0.0); // TOFIX : Détermination de l'angle de rotation
+        Vector3d tempVector1 = {character_->GetCoordinates().GetXDirection().x, 0.0, character_->GetCoordinates().GetXDirection().z}, tempVector2 = {front_.x, 0.0, front_.z};
+        rotMatrix.LoadRotation({ 0.0, 1.0, 0.0 }, tempVector1.GetAngle(tempVector2)); // TOFIX : Détermination de l'angle de rotation
         position_ = position_ - target_;
         position_ = rotMatrix * position_;
         position_ = position_ + target_;
-        
+        */
+
         // Mise à jour des vecteurs de la caméra
         up_ = { 0.0, 1.0, 0.0 };
         front_ = target_ - position_; front_.Normalize();
@@ -91,14 +94,24 @@ public:
         up_ = (side_ % front_); up_.Normalize();
 
         // Mise à jour de la vitesse de déplacement de la caméra
-        // TODO: Calculer la vitesse de la caméra
-        if ((target_ - position_).GetNorm() > BASEDISTANCE)
-          speed_ = speed_ + 0.2;
+        if ((target_ - position_).GetNorm() > BASEDISTANCE && (target_ - position_).GetNorm() < previousDistance_) {
+            if (speed_ > 0.0)
+                speed_ = speed_ - 20.0;
+        }
         else
-          speed_ = 0.0;
+            if ((target_ - position_).GetNorm() > BASEDISTANCE)
+                if (speed_ < 25.0)
+                    speed_ = speed_ + 20.0;
+        
+        previousDistance_ = (target_ - position_).GetNorm();
 
         // Mise à jour de la position de la caméra
         position_ = position_ + (front_ * speed_ * deltaT);
+        position_.y = character_->GetCoordinates().GetOrigin().y + 15.0;
+
+        front_ = target_ - position_; front_.Normalize();
+        side_ = (front_ % up_); side_.Normalize();
+        up_ = (side_ % front_); up_.Normalize();
 
         // Mise à jour de la matrice de la caméra
         viewMatrix_.LoadView(front_, side_, up_);
@@ -151,9 +164,9 @@ public:
             viewMatrix_.LoadView(front_, side_, up_);
         } break;
 
-        case SDL_KEYDOWN:
+        case 771:
 
-            switch (sdlEvent.key.keysym.sym) {
+            switch (sdlEvent.key.state) {
             case SDLK_w:
                 forward_ = true;
                 break;

@@ -15,11 +15,10 @@
 #include "SceneJeu.hpp"
 #include "SceneControl.hpp"
 #include "SceneOptions.hpp"
-#include "SceneClassement.hpp"
 #include "SceneManager.hpp"
 #include "ResourceManager.hpp"
 #include "SceneResultat.hpp"
-#include "TestElie.hpp" 
+#include "SceneJeu.hpp" 
 void FonctionBoutonJouer();
 void FonctionBoutonCommentJouer();
 void FonctionBoutonOptions();
@@ -68,6 +67,8 @@ public:
 		UnsubscribeEvent(SDL_MOUSEMOTION, boutonQuitter_);
 		UnsubscribeEvent(SDL_MOUSEBUTTONUP, boutonQuitter_);
 
+		UnsubscribeEvent(SDL_MOUSEMOTION, Cursor::GetInstance());
+
 		ClearDrawableList();
 
 		if (boutonJouer_) {
@@ -97,8 +98,9 @@ public:
 
 		ClearEventDispatcherMap();
 		ClearDrawableList();
-		
-		backgroundImage_ = new Image(*(ResourceManager::GetResource<unsigned int*>("menuBackground")), { 0,0,1000,700 }, false);// image � changer
+
+		SDL_Point windowSize = Application::GetInstance()->GetWindow()->GetSize();
+		backgroundImage_ = new Image(*(ResourceManager::GetResource<unsigned int*>("menuBackground")), { 0, 0, windowSize.x, windowSize.y }, false);
 		backgroundImage_->SetPriority(1);
 		AddDrawable(backgroundImage_);
 
@@ -144,19 +146,21 @@ public:
 		AddDrawable(boutonQuitter_);
 
 		Cursor::GetInstance()->Init(*(ResourceManager::GetResource<unsigned int*>("cursor")), {0,0,0,0});
-		SubscribeEvent(SDL_MOUSEMOTION, Cursor::GetInstance());		
+		SubscribeEvent(SDL_MOUSEMOTION, Cursor::GetInstance());
 	}
 
 	///\brief Gère les événements
 	///\param sdlEvent variable ou sont stockés tous les événements
 	void HandleEvent(SDL_Event sdlEvent) {
-		boutonJouer_->Notification(sdlEvent);
+		if (eventDispatcher_.find(sdlEvent.type) != eventDispatcher_.end())
+			eventDispatcher_[sdlEvent.type]->Notify(sdlEvent);
+		/*boutonJouer_->Notification(sdlEvent);
 		boutonQuitter_->Notification(sdlEvent);
 		boutonCommentJouer_->Notification(sdlEvent);
 		boutonClassement_->Notification(sdlEvent);
  		boutonOptions_->Notification(sdlEvent);
 
-		Cursor::GetInstance()->Notification(sdlEvent);
+		Cursor::GetInstance()->Notification(sdlEvent);*/
 	}
 
 	///\brief Gère les mises à jours
@@ -184,7 +188,7 @@ public:
 		switch (currentsceneId_){
 
 		case SCENEJEU:
-			Application::GetInstance()->AddScene(SCENEELIE, new TestElie());
+			Application::GetInstance()->AddScene(SCENEELIE, new SceneJeu());
 			Application::GetInstance()->SetScene(SCENEELIE);
 			//Application::GetInstance()->RemoveScene(SCENEMENU);
 			break;

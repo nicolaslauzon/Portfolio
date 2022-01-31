@@ -26,6 +26,7 @@ public:
 
     virtual void Transform(const Matrix44d& transformationMatrix) {
         mesh_->Transform(transformationMatrix);
+        //position_.SetOrigin({})
     }
 
     virtual void Scale(const Vector3d& scaleValue) {
@@ -37,6 +38,11 @@ public:
         mesh_->Draw();
     }
 
+    ///\brief set la texture
+    void SetTexture(unsigned int texId) {
+        mesh_->setTexture(texId);
+    }
+
     double GetRayon() const {
         return mesh_->GetFarthestPoint();
     }
@@ -44,6 +50,21 @@ public:
     const CoordinateSystem& GetPosition() {
         return position_;
     }
+
+    void SetOrigin(const Vector3d& position) {
+        position_.SetOrigin(position);
+    }
+
+    void SetZDirection(const Vector3d& position) {
+        position_.SetZDirection(position);
+    }
+    void SetXDirection(const Vector3d& position) {
+        position_.SetXDirection(position);
+    }
+
+
+
+
 };
 
 #endif // OBJET3DDRAWABLE_HPP

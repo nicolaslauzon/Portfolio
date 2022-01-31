@@ -5,36 +5,45 @@
 
 #include "Chrono.hpp"
 #include "Label.hpp"
+#include "RectFill.hpp"
+
 ///\class ChronoHud.hpp
 ///\brief Affichage d'un chrono
 class ChronoHud : public Label{
 protected:
 
 	Chrono chrono_; ///< Chrono
-
+	RectFill* background_;
+	string temp_;
+	double finalTime_;
 public:
-	ChronoHud(SDL_Rect rectchrono, TTF_Font* font, SDL_Color color, const char* content) : Label(rectchrono, font, color, content) {
+	ChronoHud(SDL_Rect rectchrono, TTF_Font* font, SDL_Color color, const char* content) : Label({rectchrono.x+5,rectchrono.y,rectchrono.w,rectchrono.h}, font, color, content) {
+		background_ = new RectFill(rectchrono, {235,124,200,255});
 		rectchrono = rect_;
 		chrono_.Reset();
-		chrono_.Start();
-		SetText((to_string(chrono_.GetElapsedSeconds()).c_str()));
+		finalTime_ = 0.0;
 	}
-	///\brief Arrete le chrono
-	void Stop() {
-		chrono_.Stop();
-	}
-	///\brief Part le chrono
-	void Start() {
-		chrono_.Start();
-	}
+	
 	///\brief Retourne la valeur du chrono
 	double GetValeurChrono() {
 		return (chrono_.GetElapsedSeconds());
 	}
 
+	void endRun() {
+		finalTime_ = chrono_.GetElapsedSeconds();
+	}
+
+	double getFinalTime() {
+			return finalTime_;
+	}
+
 	///\brief Affiche le chrono
 	void Draw() {
-		SetText((to_string(chrono_.GetElapsedSeconds()).c_str()));
+		background_->Draw();
+		temp_ = to_string(chrono_.GetElapsedSeconds());
+		
+		SetText((temp_.substr(0, temp_.find(".") + 3)).c_str());
+
 		glBindTexture(GL_TEXTURE_2D, labelId_);
 		glBegin(GL_QUADS);
 			glTexCoord2i(0.0, 0.0); glVertex3d(rect_.x, rect_.y, 0.0);

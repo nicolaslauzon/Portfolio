@@ -26,7 +26,7 @@ void Solver::InfixOpenBrace()
 
 void Solver::InfixCloseBrace()
 {
-    while (pile_operateur_.size() && (pile_operateur_.top().Type() != c_Token::c_TokenTyoe::kOpenBraceTokenType)) {
+    while (pile_operateur_.size() && (pile_operateur_.top().Type() != c_Token::c_TokenType::kOpenBraceTokenType)) {
         file_postfix_.push(pile_operateur_.top());
         pile_operateur_.pop();
     }
@@ -65,13 +65,13 @@ void Solver::InfixGetPostFix()
     c_Token var;
     while (file_infix_.size()) {
         var = file_infix_.front();
-        if (var.Type() == c_Token::c_TokenTyoe::kOpenBraceTokenType){
+        if (var.Type() == c_Token::c_TokenType::kOpenBraceTokenType){
             InfixOpenBrace();
         }
-        else if (var.Type() == c_Token::c_TokenTyoe::kCloseBraceTokenType){
+        else if (var.Type() == c_Token::c_TokenType::kCloseBraceTokenType){
             InfixCloseBrace();
         }
-        else if (var.Type()==c_Token::c_TokenTyoe::kMultiplyTokenType||var.Type()==c_Token::c_TokenTyoe::kDivideTokenType||var.Type()==c_Token::c_TokenTyoe::kModuloTokenType||var.Type()==c_Token::c_TokenTyoe::kPlusTokenType||var.Type()==c_Token::c_TokenTyoe::kMinusTokenType){
+        else if (var.Type()==c_Token::c_TokenType::kMultiplyTokenType||var.Type()==c_Token::c_TokenType::kDivideTokenType||var.Type()==c_Token::c_TokenType::kModuloTokenType||var.Type()==c_Token::c_TokenType::kPlusTokenType||var.Type()==c_Token::c_TokenType::kMinusTokenType){
             InfixOperator();
         }
         else
@@ -107,19 +107,19 @@ void Solver::PostFixDoOperation()
 {
     std::string tmp;
     int operande1, operande2;
-    c_Token::c_TokenTyoe operateur = file_postfix_.front().Type();
+    c_Token::c_TokenType operateur = file_postfix_.front().Type();
     file_postfix_.pop();
     operande1 = atoi(pile_operateur_.top().ValueString().c_str());
     pile_operateur_.pop();
     operande2 = atoi(pile_operateur_.top().ValueString().c_str());
     pile_operateur_.pop();
-    if (operateur == c_Token::c_TokenTyoe::kPlusTokenType){
+    if (operateur == c_Token::c_TokenType::kPlusTokenType){
         operande1 = operande2 + operande1;
     }
-    else if (operateur == c_Token::c_TokenTyoe::kMinusTokenType){
+    else if (operateur == c_Token::c_TokenType::kMinusTokenType){
         operande1 = operande2 - operande1;
     }
-    else if (operateur == c_Token::c_TokenTyoe::kDivideTokenType){
+    else if (operateur == c_Token::c_TokenType::kDivideTokenType){
         if (!operande1) {
             error_message_ = "The equation you  entered is invalid. Division by 0.";
             is_valid_ = false;
@@ -129,10 +129,10 @@ void Solver::PostFixDoOperation()
             is_valid_ = true;
         }
     }
-    else if (operateur == c_Token::c_TokenTyoe::kMultiplyTokenType){
+    else if (operateur == c_Token::c_TokenType::kMultiplyTokenType){
         operande1 = operande2 * operande1;
     }
-    else if (operateur == c_Token::c_TokenTyoe::kModuloTokenType){
+    else if (operateur == c_Token::c_TokenType::kModuloTokenType){
         if (!operande1) {
             error_message_ = "The equation you  entered is invalid. Modulo by 0.";
             is_valid_ = false;
@@ -155,7 +155,7 @@ void Solver::SolutionFinder()
         PostfixStackOperandes();
     }
     while (pile_operateur_.size() != 1 || file_postfix_.size()) {
-        if (file_postfix_.front().Type() == c_Token::c_TokenTyoe::kPlusTokenType || file_postfix_.front().Type() == c_Token::c_TokenTyoe::kMinusTokenType || file_postfix_.front().Type() == c_Token::c_TokenTyoe::kModuloTokenType || file_postfix_.front().Type() == c_Token::c_TokenTyoe::kDivideTokenType || file_postfix_.front().Type() == c_Token::c_TokenTyoe::kMultiplyTokenType){
+        if (file_postfix_.front().Type() == c_Token::c_TokenType::kPlusTokenType || file_postfix_.front().Type() == c_Token::c_TokenType::kMinusTokenType || file_postfix_.front().Type() == c_Token::c_TokenType::kModuloTokenType || file_postfix_.front().Type() == c_Token::c_TokenType::kDivideTokenType || file_postfix_.front().Type() == c_Token::c_TokenType::kMultiplyTokenType){
             PostFixDoOperation();
         }
         else {
@@ -165,21 +165,21 @@ void Solver::SolutionFinder()
     //answer = stoi(pile_operateur_.top().ValueString());
 }
 
-int PriorityFromTokenType(c_Token::c_TokenTyoe token_type)
+int PriorityFromTokenType(c_Token::c_TokenType token_type)
 {
     switch (token_type){
-    case c_Token::c_TokenTyoe::kMultiplyTokenType:
-    case c_Token::c_TokenTyoe::kDivideTokenType:
-    case c_Token::c_TokenTyoe::kModuloTokenType:
+    case c_Token::c_TokenType::kMultiplyTokenType:
+    case c_Token::c_TokenType::kDivideTokenType:
+    case c_Token::c_TokenType::kModuloTokenType:
         return 3;
-    case c_Token::c_TokenTyoe::kMinusTokenType:
-    case c_Token::c_TokenTyoe::kPlusTokenType:
+    case c_Token::c_TokenType::kMinusTokenType:
+    case c_Token::c_TokenType::kPlusTokenType:
         return 2;
-    case c_Token::c_TokenTyoe::kOpenBraceTokenType:
-    case c_Token::c_TokenTyoe::kCloseBraceTokenType:
+    case c_Token::c_TokenType::kOpenBraceTokenType:
+    case c_Token::c_TokenType::kCloseBraceTokenType:
         return 1;
-    case c_Token::c_TokenTyoe::kIntTokenType:
-    case c_Token::c_TokenTyoe::kUnknownTokenType:
+    case c_Token::c_TokenType::kIntTokenType:
+    case c_Token::c_TokenType::kUnknownTokenType:
         break;
     }
     return -1;

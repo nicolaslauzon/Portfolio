@@ -8,6 +8,9 @@
 #include "Resource.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+
+#include "Physic.hpp"
+#include "Matrix44d.hpp"
 //#include <iostream>
 
 using namespace std;
@@ -22,6 +25,7 @@ protected:
     double farthestPoint = 0.0;
     double variablePoint;
 
+ 
 public:
     ///\brief Chargement du modèle
     ///\param fileName Nom du fichier de modèle à charger
@@ -36,7 +40,8 @@ class TexturedMesh : public Mesh {
 private:
     unsigned int textureId; ///< Identifiant de texture
     double* textureCoords; ///< Tableau de coordonnées de texture
-
+    size_t i1, i2;
+    unsigned int vertexCount3;
 public:
 
     TexturedMesh() {}
@@ -44,19 +49,31 @@ public:
       if (texturedMesh) {
         this->farthestPoint = texturedMesh->farthestPoint;
         this->vertexCount = texturedMesh->vertexCount;
-
-        this->vertices = new double[this->vertexCount * 3];
-        this->normals = new double[this->vertexCount * 3];
+        vertexCount3 = vertexCount * 3;
+        this->vertices = new double[this->vertexCount3];
+        this->normals = new double[this->vertexCount3];
         this->textureCoords = new double[this->vertexCount * 2];
 
-        copy(&texturedMesh->vertices[0], &texturedMesh->vertices[this->vertexCount * 3], this->vertices);
-        copy(&texturedMesh->normals[0], &texturedMesh->normals[this->vertexCount * 3], this->normals);
+        copy(&texturedMesh->vertices[0], &texturedMesh->vertices[this->vertexCount3], this->vertices);
+        copy(&texturedMesh->normals[0], &texturedMesh->normals[this->vertexCount3], this->normals);
         copy(&texturedMesh->textureCoords[0], &texturedMesh->textureCoords[this->vertexCount * 2], this->textureCoords);
       }
     }
 
     void* GetData() {
       return this;
+    }
+
+    const double* GetVertices() const {
+        return vertices;
+    }
+
+    const double* GetNormals() const {
+        return normals;
+    }
+
+    unsigned int GetVertexCount() const {
+        return vertexCount;
     }
 
     ///\brief Chargement du modèle
@@ -125,8 +142,9 @@ public:
             ifs.close();
 
             vertexCount = tmpVertexIndex.size();
-            vertices = new double[vertexCount * 3];
-            normals = new double[vertexCount * 3];
+            vertexCount3 = vertexCount * 3;
+            vertices = new double[vertexCount3];
+            normals = new double[vertexCount3];
             textureCoords = new double[vertexCount * 2];
 
             for (unsigned int i = 0; i < vertexCount; i++) {
@@ -180,57 +198,40 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, vertexCount);
     }
 
-    void Transform(Matrix44d matrix) {
-        bool transformationCentered = true;
-        if (matrix.GetMatrix()[12] != 0.0 || matrix.GetMatrix()[13] != 0.0 ||matrix.GetMatrix()[14] != 0.0) {
-            transformationCentered = false;
-        }
+     void Transform(Matrix44d matrix) {
+        double* tMatrix = matrix.GetMatrix();
+        size_t y, z, n = vertexCount * 3;
+        double vX, vY, vZ, nX, nY, nZ;
 
-        Vector3d convertion;
-        for (size_t i = 0; i < vertexCount*3; i+=3) {
-            //vertices ------------------
-            convertion.x = vertices[i];
-            convertion.y = vertices[i+1];
-            convertion.z = vertices[i+2];
+        for (size_t x = 0; x < n; x += 3) {
+            // index
+            y = x + 1;
+            z = x + 2;
 
-            // offset
-            if (transformationCentered == false) {
-                convertion.x -= matrix.GetMatrix()[12];
-                convertion.y -= matrix.GetMatrix()[13];
-                convertion.z -= matrix.GetMatrix()[14];
-            }
+            // vertex
+            vX = vertices[x] - tMatrix[12];
+            vY = vertices[y] - tMatrix[13];
+            vZ = vertices[z] - tMatrix[14];
 
             // rotation
-            convertion = matrix * convertion;
-
-            // remise en place
-            if (transformationCentered == false) {
-                convertion.x += matrix.GetMatrix()[12];
-                convertion.y += matrix.GetMatrix()[13];
-                convertion.z += matrix.GetMatrix()[14];
-            }
-
-            // translation
-            convertion.x += matrix.GetMatrix()[3];
-            convertion.y += matrix.GetMatrix()[7];
-            convertion.z += matrix.GetMatrix()[11];
+            nX = vX * tMatrix[0] + vY * tMatrix[4] + vZ * tMatrix[8];
+            nY = vX * tMatrix[1] + vY * tMatrix[5] + vZ * tMatrix[9];
+            nZ = vX * tMatrix[2] + vY * tMatrix[6] + vZ * tMatrix[10];
             
-            // stockage
-            vertices[i] = convertion.x;
-            vertices[i+1] = convertion.y;
-            vertices[i+2] = convertion.z;
+            // stock
+            vertices[x] = nX + tMatrix[12] + tMatrix[3];
+            vertices[y] = nY + tMatrix[13] + tMatrix[7];
+            vertices[z] = nZ + tMatrix[14] + tMatrix[11];
 
-            //normals -------------------
-            convertion.x = normals[i];
-            convertion.y = normals[i+1];
-            convertion.z = normals[i+2];
+            // normal
+            vX = normals[x];
+            vY = normals[y];
+            vZ = normals[z];
 
-            // rotation
-            convertion = matrix * convertion;
-
-            normals[i] = convertion.x;
-            normals[i+1] = convertion.y;
-            normals[i+2] = convertion.z;
+            // rotation & stock
+            normals[x] = (vX * tMatrix[0] + vY * tMatrix[4] + vZ * tMatrix[8]);
+            normals[y] = (vX * tMatrix[1] + vY * tMatrix[5] + vZ * tMatrix[9]);
+            normals[z] = (vX * tMatrix[2] + vY * tMatrix[6] + vZ * tMatrix[10]);
         }
     }
 
@@ -238,23 +239,80 @@ public:
         Matrix44d matrix;
         matrix.LoadIdentity();
         matrix.LoadScale(scaleValue);
+        
+        vertexCount3 = vertexCount * 3;
 
         Vector3d convertion;
-        for (size_t i = 0; i < vertexCount*3; i+=3) {
+        for (size_t i = 0; i < vertexCount3; i+=3) {
+            i1 = i + 1;
+            i2 = i + 2;
+
             convertion.x = vertices[i];
-            convertion.y = vertices[i+1];
-            convertion.z = vertices[i+2];
+            convertion.y = vertices[i1];
+            convertion.z = vertices[i2];
 
             convertion = matrix * convertion;
 
             vertices[i] = convertion.x;
-            vertices[i+1] = convertion.y;
-            vertices[i+2] = convertion.z;
+            vertices[i1] = convertion.y;
+            vertices[i2] = convertion.z;
         }
     }
 
     inline double GetFarthestPoint() {
         return farthestPoint;
+    }
+
+    const Vector3d* Collision(Vector3d origin, Vector3d segment) const {
+        // tous les 3 indices = 1 vecteur // tous les 9 indices = 1 triangle
+        // tous les 3 indices = 1 normale // tous les 9 indices = 3 normales
+        Vector3d* result = nullptr;
+        for (int i = 0; i < vertexCount*3; i+=9) {
+            Vector3d triangle[3];
+            triangle[0].x = vertices[i]; triangle[0].y = vertices[i+1]; triangle[0].z = vertices[i+2];
+            triangle[1].x = vertices[i+3]; triangle[1].y = vertices[i+4]; triangle[1].z = vertices[i+5];
+            triangle[2].x = vertices[i+6]; triangle[2].y = vertices[i+7]; triangle[2].z = vertices[i+8];
+
+            Vector3d normal;
+            normal.x = normals[i]; normal.y = normals[i+1]; normal.z = normals[i+2];
+
+            Vector3d* tmp = Physic::RayThroughPlane(segment, origin, triangle, normal);
+            if (!result) {
+                result = tmp;
+            }
+            else if (tmp && ((*tmp - origin).GetNorm() < (*result - origin).GetNorm())) {
+                delete result;
+                result = tmp;
+            }
+        }
+        if (result)
+            return result;
+        return nullptr;
+    }
+
+    const std::tuple<Vector3d*, Vector3d> CollisionReturnNormal(Vector3d origin, Vector3d segment) const {
+        // tous les 3 indices = 1 vecteur // tous les 9 indices = 1 triangle
+        // tous les 3 indices = 1 normale // tous les 9 indices = 3 normales
+        Vector3d* result = nullptr;
+        Vector3d normal;
+        for (int i = 0; i < vertexCount*3; i+=9) {
+            Vector3d triangle[3];
+            triangle[0].x = vertices[i]; triangle[0].y = vertices[i+1]; triangle[0].z = vertices[i+2];
+            triangle[1].x = vertices[i+3]; triangle[1].y = vertices[i+4]; triangle[1].z = vertices[i+5];
+            triangle[2].x = vertices[i+6]; triangle[2].y = vertices[i+7]; triangle[2].z = vertices[i+8];
+
+            normal.x = normals[i]; normal.y = normals[i+1]; normal.z = normals[i+2];
+
+            Vector3d* tmp = Physic::RayThroughPlane(segment, origin, triangle, normal);
+            if (!result) {
+                result = tmp;
+            }
+            else if (tmp && ((*tmp - origin).GetNorm() < (*result - origin).GetNorm())) {
+                delete result;
+                result = tmp;
+            }
+        }
+        return std::tuple<Vector3d*, Vector3d>{result, normal};
     }
 };
 

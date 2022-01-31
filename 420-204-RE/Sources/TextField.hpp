@@ -151,7 +151,7 @@ public:
         isHovered_ = SDL_PointInRect(&click, &rect_);
 
         // Est-ce que la zone de texte est "focussed" par l'utilisateur
-        if (sdlEvent.type == SDL_MOUSEBUTTONDOWN) {
+        if (sdlEvent.type == SDL_MOUSEBUTTONUP) {
             if (isHovered_ == true) {
                 isFocused_ = true;
             }
@@ -161,17 +161,17 @@ public:
         }
         
         // Test des touches shifts
-        if (keyId == SDLK_RSHIFT || keyId == SDLK_LSHIFT) {
+        /*if (keyId == SDLK_RSHIFT || keyId == SDLK_LSHIFT) {
             if (sdlEvent.type == SDL_KEYDOWN) {
                 uppercaseOn_ = true;
             }
             else if (sdlEvent.type == SDL_KEYUP) {
                 uppercaseOn_ = false;
             }
-        }
+        }*/
 
         //Gestion de l'écriture dans la zone de texte
-        if (isFocused_ && sdlEvent.type == SDL_KEYDOWN) {
+        if (isFocused_ && sdlEvent.type == SDL_KEYUP) {
             auto key = keyMap.find(keyId);
             if (key != keyMap.end()) {
                 if (uppercaseOn_) {
@@ -206,7 +206,7 @@ public:
         //background_->Draw();
         text_->Draw();
         if (isHovered_) {
-            //hover_->Draw();
+            hover_->Draw();
         }
     }
 };

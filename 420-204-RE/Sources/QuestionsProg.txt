@@ -1,0 +1,96 @@
+À quoi correspond l'élément Au dans le tableau périodique?
+1) Azote    2) Arsenic  3) Or   4) Aluminium
+3
+À quoi correspond l'élément N dans le tableau périodique?
+1) Sodium   2) Azote    3) Néon 4) Nickel
+2
+À quoi correspond l'élément Sn dans le tableau périodique?
+1) Simon    2) Soufre   3) Strontium    4) Étain
+4
+Quel paire d'éléments fait partie de la famille des gaz inertes?
+1) He, Rnm  2) Og, Ni   3) Kr, Li   4) Rnm, K
+1
+Quel paire d'éléments fait partie de la famille des alcalins?
+1) Li, Bk   2) Al, Na   3)  Cs, Fr  4)  Al, Bk
+3
+Quel paire d'éléments fait partie de la famille des alcalino-terreux?
+1) Ba, Be   2) Ra, Re   3) Ca, C    4) Na, K
+1
+Quel paire d'éléments fait partie de la famille des halogènes?
+1) F, N     2) I, O     3) Y, I     4) Cl, At
+4
+Quel est l'élément le plus léger?
+1) Lawrencium   2) Fluor    3) Hydrogène 4) Néon
+3
+Quel est la nationalité d'Aristote?
+1) Chinoix      2) Grec     3) Romain    4) Canadien
+2
+Quel est la relation entre Platon et Aristote?
+1) Maitre / Élève   2) Père / Fils  3) Amis     4) Amoureux
+1
+Qui a inventé le langage B?
+1) Nicolas Lauzon   2) Ken Thompson     3) Dennis Ritchie   4) Steve Harris
+2
+Comment nomme t-on le 18e siècle?
+1) Le siècle du soleil  2) La grande noirceur   3) Le siècle des lumières   4) La renaissance
+3
+Qui est l'auteur de la théorie de la relativité?
+1) Isaac Newton     2) Niels Bohr   3) Max Planck     4) Albert Einstein
+4
+Qui est la première femme à avoir gagner le prix Nobel?
+1) Marie Curie  2) Selena Gomez     3) Simone de Beauvoir   4) Grazia Deledda
+1
+Qui a inventé le téléphone?
+1) Thomas Edison   2) Alexander Graham Bell    3) Nikola Tesla  4) Kevin James
+2
+Quelle est la capitale du Canada?
+1) Toronto  2) Vancouver    3) Montréal     4) Ottawa
+4
+Quelle est la capitale de la Russie?
+1) Saint-Pétersbourg    2) Moscou   3) Kremlin  4) Sotchi
+2
+Quelle est la capitale de l'Inde?
+1) Mumbai   2) Kolkata  3) New Delhi    4) Bengaluru
+3
+Quelle est la capitale du Danemark?
+1) Copenhague   2) Stockholm    3) Oslo 4) Helsinki
+1
+Quelle est la capitale du Brésil?
+1) São Paulo    2) Brasilia     3) Rio de Janeiro   4) Buenos Aires
+2
+À environ combien s'élève la population mondiale?
+1) 7,8 milliards    2) 8,7 milliards    3) 8,7 millions 4) 8,2 milliards
+1
+Quel est le pays qui a la plus forte population?
+1) Inde     2) États-Unis   3) Chine    4) Brésil
+3
+Quand commence la première guerre mondiale?
+1) 1918     2) 1912     3) 1914     4) 1939
+3
+Qui a mis le premier pied sur la Lune?
+1) Louis Armstrong  2) Neil Armstrong   3) Buzz Aldrin  4) Buzz Lightyear
+2
+Qui a remporté la coupe du monde en 2018?
+1) Brézil   2) Allemagne    3) Zimbabwe     4) France
+4
+Quelle est la valeur de : !(7 < 3 && 2 = (7 - 5)) 
+1) vrai     2) faux
+1
+Est-ce qu'une classe est utilisable en C?
+1) faux     2) vrai
+1
+Un pointeur fait, dans l'ordre: 
+1) Allocation de l'espace mémoire, Appel du constructeur, Effacement de la donnée  2) Allocation de l'espace mémoire, Retour de l'adresse mémoire, Appel    3) Retour de l'adresse mémoire, Allocation de l'espace mémoire, Effacement de la donnée  4) Aucune de ces réponses
+4
+Vrai ou faux: la zone cible est une fréquences cardiaque à viser afin de s'améliorer et se situe entre 50 et 80%.
+1) faux     2) vrai
+1
+Lequel de ces philosophe est le plus ancien: 
+1) Platon   2) Kant     3) Socrate      4) Aristote
+3
+Vrai ou faux: La phrase suivante est un chiasme: Il faut manger pour vivre et non vivre pour manger.
+1) vrai     2) faux
+1
+Quelle est la forme du verbe swing au participe passé: 
+1) swang    2) swung    3) swinged  4) swing
+2

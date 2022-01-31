@@ -13,6 +13,7 @@
 #endif
 
 #include <map>
+#include <fstream>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -60,7 +61,17 @@ public:
 		IMG_Init(IMG_INIT_PNG);
 		TTF_Init();
 
-		window_ = new GlContext("PI 2021", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 700, SDL_WINDOW_OPENGL);
+		ifstream reader("Resources/config", ifstream::in);
+		if (!reader.is_open()) reader.open("config", ifstream::in);
+
+		int width, height;
+		bool fullscreen;
+		reader >> width;
+		reader >> height;
+		reader >> fullscreen;
+		reader.close();
+
+		window_ = new GlContext("PI 2021", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, (fullscreen) ? SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_OPENGL);
 
 		SDL_ShowCursor(false);
 
@@ -70,11 +81,10 @@ public:
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0.0, 1000.0, 700.0, 0.0, 1.0, -1.0);
+		glOrtho(0.0, width, height, 0.0, 1.0, -1.0);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-
 	}
 
 	~Application() {
@@ -116,7 +126,11 @@ public:
 				switch (sdlEvent_.type) {
 					case SDL_QUIT:
 							isOpen = false;
-							break;						
+							break;	
+					case SDL_KEYDOWN:
+						if (sdlEvent_.key.keysym.sym == SDLK_ESCAPE)
+							isOpen = false;
+						break;
 					default:
 						scenes_[currentScene_]->HandleEvent(sdlEvent_);
 						break;

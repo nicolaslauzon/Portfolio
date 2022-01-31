@@ -13,5 +13,6 @@ public:
     Objet3dColisionable(TexturedMesh* mesh, const unsigned int& textureId) : Objet3dDrawable(mesh, textureId) {
 
     }
+
 };
 #endif

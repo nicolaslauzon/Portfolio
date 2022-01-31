@@ -13,5 +13,6 @@ public:
     const InterfaceId Id() const {
         return COLLISION;
     }
+
 };
 #endif // COLLISIONINTERFACE_HPP

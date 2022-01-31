@@ -63,7 +63,7 @@ public:
 		if (content_ != nullptr) {
 			if (labelId_ != 0)
 				glDeleteTextures(1, &labelId_);
-			fontSurface_ = TTF_RenderText_Blended(font_, content_, { color_.b, color_.g, color_.r, color_.a });
+			fontSurface_ = TTF_RenderUTF8_Blended(font_, content_, { color_.b, color_.g, color_.r, color_.a });
 			labelId_ = Application::GetInstance()->loadTexture(fontSurface_);
 			rect_.w = fontSurface_->w;
 			rect_.h = fontSurface_->h;

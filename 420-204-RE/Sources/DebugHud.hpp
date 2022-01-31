@@ -153,6 +153,7 @@ private:
 public:
 
     DebugHud() {
+        SDL_Point windowSize = Application::GetInstance()->GetWindow()->GetSize();
         framesBuffer_ = 0;
         deltaTBuffer_ = 0.0;
 
@@ -164,15 +165,15 @@ public:
         int w = 0, h = 0;
 
         TTF_SizeText(font, "FPS: 60", &w, &h);
-        Label* fps = new Label({1000-w, 200, 0, 0}, font, {0, 0, 0, 255},"FPS: ");
+        Label* fps = new Label({windowSize.x-w, 200, 0, 0}, font, {0, 0, 0, 255},"FPS: ");
         TTF_SizeText(font, "60", &w, &h);
-        Label* fpsValue = new Label({1000-w, 200, 0, 0}, font, {0, 0, 0, 255}, " ");
+        Label* fpsValue = new Label({windowSize.x-w, 200, 0, 0}, font, {0, 0, 0, 255}, " ");
         TTF_SizeText(font, "Speed vectors", &w, &h);
-        Label* speed = new Label({1000-w, 200+h, 0, 0}, font, {0, 0, 0, 255}, "Speed vectors");
+        Label* speed = new Label({windowSize.x-w, 200+h, 0, 0}, font, {0, 0, 0, 255}, "Speed vectors");
         TTF_SizeText(font, "Collision sphere", &w, &h);
-        Label* collisionSphere = new Label({1000-w, 200+h*2, 0, 0}, font, {0, 0, 0, 255}, "Collision sphere");
+        Label* collisionSphere = new Label({windowSize.x-w, 200+h*2, 0, 0}, font, {0, 0, 0, 255}, "Collision sphere");
         TTF_SizeText(font, "Centre de masse", &w, &h);
-        Label* centreDeMasse = new Label({1000-w, 200 + h*3, 0, 0}, font, {0, 0, 0, 255}, "Centre de masse");
+        Label* centreDeMasse = new Label({windowSize.x-w, 200 + h*3, 0, 0}, font, {0, 0, 0, 255}, "Centre de masse");
         
         SDL_Rect rect = centreDeMasse->GetDstRect();
         rect.y -= h*3;
@@ -252,6 +253,13 @@ public:
         }
     }
 
+    void AddSpeedDebug(Vector3d position, Vector3d* speed) {
+        Objet3dDrawable* obj = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("debugCenterMass"), *(ResourceManager::GetResource<unsigned int*>("debugCenterMass.png")));
+        obj->SetOrigin(position);
+        DisplaySpeedVector* v = new DisplaySpeedVector(obj, speed);
+        speed_.push_back(v);
+    }
+
     ///\brief refresh le debug hud
     ///\param deltaT delta time
     void HandleRefresh(double deltaT) {
@@ -284,7 +292,22 @@ public:
     }
 
     ///\brief Draw le debug hud
-    void Draw() {
+    void Draw2D() {
+        #ifdef DEBUG
+            if (draw_) {
+                for (auto drawable : overlayNotification_) {
+                    drawable.second->Draw();
+                }
+                for (auto drawable : overlay_) {
+                    drawable.second->Draw();
+                }
+
+            }
+        #endif
+    }
+
+    ///\brief Draw le debug hud
+    void Draw3D() {
         #ifdef DEBUG
             if (draw_) {
                 if (displaySpeed_) {
@@ -302,36 +325,6 @@ public:
                         mass->Draw();
                     }
                 }
-
-                GlContext* w = dynamic_cast<GlContext*>(Application::GetInstance()->GetWindow());
-                glDisable(GL_LIGHTING);
-                glDisable(GL_LIGHT0);
-                glDisable(GL_DEPTH_TEST);
-
-                glDisableClientState(GL_VERTEX_ARRAY);
-                glDisableClientState(GL_NORMAL_ARRAY);
-                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-                if (w!= nullptr && w->GetStatus() == _3D) {
-                    w->SetDefaultPerspective(_2D);
-                }
-
-                for (auto drawable : overlayNotification_) {
-                    drawable.second->Draw();
-                }
-                for (auto drawable : overlay_) {
-                    drawable.second->Draw();
-                }
-
-                glEnable(GL_LIGHTING);
-                glEnable(GL_LIGHT0);
-                glEnable(GL_DEPTH_TEST);
-
-                glEnableClientState(GL_VERTEX_ARRAY);
-                glEnableClientState(GL_NORMAL_ARRAY);
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-
-                w->SetDefaultPerspective(_3D);
             }
         #endif
     }

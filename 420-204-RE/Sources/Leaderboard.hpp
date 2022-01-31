@@ -29,6 +29,7 @@ public:
     ///\param filename nom du fichier texte
     Leaderboard(string filename) {
         needupdate_ = false;
+        filename_ = filename;
         varfichier_.open(filename, ios::in);
         if (varfichier_) {
             string line_;
@@ -63,13 +64,13 @@ public:
     ///\brief Met en ordre la liste
     void Rank() {
         listplayers_.sort([](const pair<string, double>& a, const pair<string, double>& b)
-            { return a.second > b.second; });
+            { return a.second < b.second; });
     }
 
     ///\brief Prend la liste la met en ordre puis l'ecrit dans le fichier texte
     void Reset() {
-        varfichier_.open(filename_, ios::out);
-        if (needupdate_ && varfichier_) {
+   // C:\Users\eliet\Desktop\ToutProg\Programmation\ProgramSession4\PI2021\x64\Debug\Resources\Leaderboard.txt
+        if (needupdate_) {
             varfichier_.open(filename_, ios::out);
             needupdate_ = false;
             Rank();

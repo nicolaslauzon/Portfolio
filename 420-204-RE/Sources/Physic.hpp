@@ -57,11 +57,42 @@ public:
     }
 
     static const bool BoundingSphereCollisionTest(double rayonObjet1, double rayonObjet2, CoordinateSystem positionObjet1, CoordinateSystem positionObjet2) {
-        //sqrt(((positionObjet1.GetOrigin().x - positionObjet2.GetOrigin().x)) + (positionObjet1.GetOrigin().y - positionObjet2.GetOrigin().y) + (positionObjet1.GetOrigin().z - positionObjet1.GetOrigin().z));
         if ((sqrt(((positionObjet1.GetOrigin().x - positionObjet2.GetOrigin().x) * (positionObjet1.GetOrigin().x - positionObjet2.GetOrigin().x)) + ((positionObjet1.GetOrigin().y - positionObjet2.GetOrigin().y) * (positionObjet1.GetOrigin().y - positionObjet2.GetOrigin().y)) + ((positionObjet1.GetOrigin().z - positionObjet2.GetOrigin().z) * (positionObjet1.GetOrigin().z - positionObjet2.GetOrigin().z))) - (rayonObjet1 + rayonObjet2)) <= 0)
             return true;
         return false;
-        sqrt(((positionObjet1.GetOrigin().x - positionObjet2.GetOrigin().x) * (positionObjet1.GetOrigin().x - positionObjet2.GetOrigin().x)) + ((positionObjet1.GetOrigin().y - positionObjet2.GetOrigin().y) * (positionObjet1.GetOrigin().y - positionObjet2.GetOrigin().y)) + ((positionObjet1.GetOrigin().z - positionObjet2.GetOrigin().z) * (positionObjet1.GetOrigin().z - positionObjet2.GetOrigin().z)));
+    }
+
+    static Vector3d* RayThroughPlane(const Vector3d& segment, const Vector3d& segmentOrigin, const Vector3d triangle[3], const Vector3d& normal) {
+        const double tmp = segment * normal;
+        if (std::abs(tmp) < 1e-5) {
+            return nullptr;
+        }
+
+        const Vector3d w = triangle[0] - segmentOrigin;
+
+        const double r = (normal * w) / (tmp);
+        if (r < 0.0) {
+            return nullptr;
+        }
+        else if (r > 1.0) {
+            return nullptr;
+        }
+        const Vector3d i = segment * r + segmentOrigin;
+        // A[0] // B[1] // C[2]
+        const Vector3d AB = triangle[1] - triangle[0];
+        Vector3d v = AB - AB.Projected(triangle[1] - triangle[2]);
+
+        const double a = 1.0 - (v * (i - triangle[0])) / (v * AB);
+
+        const Vector3d BC = triangle[2] - triangle[1];
+        v = BC - BC.Projected(triangle[2] - triangle[0]);
+
+        const double b = 1.0 - (v * (i - triangle[1])) / (v * BC);
+        
+        if ((a <= 1.0 && a >= 0.0) && (b <= 1.0 && b >= 0.0))
+            return new Vector3d(i);
+        
+        return nullptr;
     }
 };
 #endif // PHYSIC_HPP

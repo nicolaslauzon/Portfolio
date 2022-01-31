@@ -33,6 +33,7 @@ public:
         matrix.LoadIdentity();
         matrix.LoadRotation(rotationAxis, angle);
         Transform(matrix);
+        
     }
 
     ///\brief effectue une transformation sur l'objet

@@ -30,7 +30,8 @@ private:
 
 public:	
 	void Init() {
-		AddDrawable(new RectFill({ 0, 0, 1000, 700 }, { 255, 255, 115, 255 }));
+		SDL_Point windowSize = Application::GetInstance()->GetWindow()->GetSize();
+		AddDrawable(new RectFill({ 0, 0, windowSize.x, windowSize.y }, { 255, 255, 115, 255 }));
 
 		progress_ = nullptr;
 		reader_.open(FileSystem::resourcePath + "ResourceList.txt", ifstream::in);
@@ -56,7 +57,8 @@ public:
 				case 'C': { // Compte
 					int resourceCount;
 					reader_ >> resourceCount;
-					progress_ = new ProgressBar({ 50, 600, 900, 50 }, 0, resourceCount, { 50, 50, 50, 255 }, { 150, 150, 150, 255 });
+					SDL_Point windowSize = Application::GetInstance()->GetWindow()->GetSize();
+					progress_ = new ProgressBar({ 50, windowSize.y - 100, windowSize.x - 100, 50 }, 0, resourceCount, { 50, 50, 50, 255 }, { 150, 150, 150, 255 });
 					AddDrawable(progress_);
 				} break;
 

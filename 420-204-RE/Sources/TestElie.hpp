@@ -15,98 +15,122 @@
 #include "DebugHud.hpp"
 #include "Sprite3dDrawable.hpp"
 #include "Plateformes.hpp"
+#include "Ventilateur.hpp"
+#include "Quiz.hpp"
+#include "Aimant.hpp"
+#include "Checkpoint.hpp"
+#include "Capsules.hpp"
+
+enum CameraType { Dynamic, Flying };
 
 class TestElie : public Scene {
 private:
-	//TTF_Font* font;
 	Character* charac;
 
+	Quiz* quiz_;
 	Objet3dDrawable* atmosphere_;
-
+	Trampoline* trampoline_;
+	//PlateformeIntermittente* plateformeintermittente_;
 	PlateformeMouvantes* plateformemouv1_;
-	Objet3dDrawable* plateforme1_;
-	Objet3dDrawable* couloirporte1_;
-	Objet3dDrawable* couloirporte2_;
-	Objet3dDrawable* couloirporte3_;
-	Objet3dDrawable* couloirporte4_;
-	Objet3dDrawable* couloirporte5_;
-	Objet3dDrawable* couloirporte6_;
+	// Objet3dDrawable* plateforme1_;
+	// Objet3dDrawable* couloirporte1_;
+	// Objet3dDrawable* couloirporte2_;
+	// Objet3dDrawable* couloirporte3_;
+	// Objet3dDrawable* couloirporte4_;
+	// Objet3dDrawable* couloirporte5_;
+	// Objet3dDrawable* couloirporte6_;
 
-	Objet3dDrawable* plateformeCheckpoint1_;
-	Objet3dDrawable* checkpointPillier1_;
-	Objet3dDrawable* checkpointFlag1_;
+	// Objet3dDrawable* plateformeCheckpoint1_;
+
+	Checkpoints* checkpoints_;	
 
 	Objet3dDrawable* couloirVentilateur1_;
 	Objet3dDrawable* couloirVentilateur2_;
 	Objet3dDrawable* couloirVentilateur3_;
-	Objet3dDrawable* Ventilateur1_;
-	Objet3dDrawable* Ventilateur2_;
-	Objet3dDrawable* Ventilateur3_;
 
-	Objet3dDrawable* plateformejump1_;
-	Objet3dDrawable* plateformejump2_;
-	Objet3dDrawable* plateformejump3_;
+	Ventilateur* Ventilateur1_;
+	Ventilateur* Ventilateur2_;
+	Ventilateur* Ventilateur3_;
 
-	Objet3dDrawable* couloirParkour1_;
-	Objet3dDrawable* plateformeParkour1_;
-	Objet3dDrawable* couloirParkour2_;
-	Objet3dDrawable* couloirParkour3_;
+	Aimant* aimant1_;
 
-	Objet3dDrawable* couloirCheckpoint2_;
-	Objet3dDrawable* checkpointPillier2_;
-	Objet3dDrawable* checkpointFlag2_;
+	// Objet3dDrawable* couloirVentilateur1_;
+	// Objet3dDrawable* couloirVentilateur2_;
+	// Objet3dDrawable* couloirVentilateur3_;
+	//Objet3dDrawable* Ventilateur1_;
 
-	Objet3dDrawable* couloirpendule1_;
-	Objet3dDrawable* couloirpendule2_;
-	Objet3dDrawable* couloirpendule3_;
+	// Objet3dDrawable* plateformejump1_;
+	// Objet3dDrawable* plateformejump2_;
+	// Objet3dDrawable* plateformejump3_;
+
+	// Objet3dDrawable* couloirParkour1_;
+	// Objet3dDrawable* plateformeParkour1_;
+	// Objet3dDrawable* couloirParkour2_;
+	// Objet3dDrawable* couloirParkour3_;
+
+	// Objet3dDrawable* couloirCheckpoint2_;
+
+	// Objet3dDrawable* couloirpendule1_;
+	// Objet3dDrawable* couloirpendule2_;
+	// Objet3dDrawable* couloirpendule3_;
 
 	Objet3dDrawable* pendule1_;
 	Objet3dDrawable* pendule2_;
 	Objet3dDrawable* pendule3_;
 
-	Objet3dDrawable* plateformeMouvante1_;
-	Objet3dDrawable* plateformeMouvante2_;
-	Objet3dDrawable* plateformeMouvante3_;
+	// Objet3dDrawable* plateformeMouvante1_;
+	 Objet3dDrawable* plateformeMouvante2_;
+	// Objet3dDrawable* plateformeMouvante3_;
 
-	Objet3dDrawable* couloirCheckpoint3_;
-	Objet3dDrawable* checkpointPillier3_;
-	Objet3dDrawable* checkpointFlag3_;
+	// Objet3dDrawable* couloirCheckpoint3_;
 
-	Objet3dDrawable* pisteGlissante_;
+	
 
-	Objet3dDrawable* labyrinthe_;
+
+
+	Labyrinthe* labyrinthe_;
+
+	Sprite3Ddrawable* cube_;
 
 	Sprite3Ddrawable* bug;
 
-	//StaticCamera* cam;
+	CameraType camType;
 	FlyingCamera* fcam;
 	DynamicCamera* dcam;
+	
 	unsigned int meshtexid;
 	double penduletime;
 	double animtime_;
-	// DebugHud* debugHud_;
 
-	//DebugHud* debugHud_;
+	DebugHud* debugHud_;
+
+	list<PlateformeStatique*> plateformes_;
+	list<Capsule*> capsules_;
 
 public:
-	TestElie() {
-
-	}
-	
 	~TestElie() {
-		//delete debugHud_;
+		UnsubscribeEvent(SDL_MOUSEBUTTONDOWN, debugHud_);
+		UnsubscribeEvent(SDL_KEYDOWN, debugHud_);
+
+		delete debugHud_;
+
+		if (camType == Flying) {
+			UnsubscribeEvent(SDL_MOUSEMOTION, fcam);
+			UnsubscribeEvent(771, fcam);
+			UnsubscribeEvent(SDL_KEYUP, fcam);
+		}
+		else {
+			UnsubscribeEvent(SDL_MOUSEMOTION, charac);
+			UnsubscribeEvent(771, charac);
+			UnsubscribeEvent(SDL_KEYUP, charac);
+		}
 	}
 
-	///\brief appel� au d�but de la sc�ne
-	///\param windowId identificateur de la fenetre
+	///\brief Initialisation de la scène
 	void Init() {
-		//font = TTF_OpenFont("MrRobot.ttf", 42);
 		penduletime = 0;
 		((GlContext*)Application::GetInstance()->GetWindow())->SetDefaultPerspective(_3D);
 		
-		float lightPos[3] = { 1000.0, 1000.0, 0.0 };
-		// glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-
 		glEnable(GL_DEPTH_TEST);
 
 		glEnable(GL_TEXTURE_2D);
@@ -115,153 +139,220 @@ public:
 
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
+		GLfloat lightColor[4] = { 0.9, 0.9, 0.9, 1.0 };
+		glLightfv(GL_LIGHT0, GL_SPECULAR, lightColor);
+		float lightPos[3] = { 1000.0, 1000.0, 0.0 };
+		glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-		//debugHud_ = new DebugHud();
+		debugHud_ = new DebugHud();
+				
+		SDL_Surface* atmosphereSurface = IMG_Load((FileSystem::imagesPath + "atmosphere.png").c_str());
 
+		// Chargement des nuages
+		SDL_Surface* cloudsSurface[8];
+		for (unsigned char i = 0; i < 8; i++)
+			cloudsSurface[i] = IMG_Load((FileSystem::imagesPath + "cloud" + to_string(i + 1) + ".png").c_str());
 
-		//cam = new StaticCamera({ 0.0,1.0,0.0 }, { 2.0,20.0,0.0 }, { 2.0, 1.0, 0.0 });
+		// Application des nuages
+		int randomCloud, cloudCount = rand() % 30;
+		SDL_Rect cloudRect;
+		for (unsigned char i = 0; i < 20; i++) {
+			randomCloud = rand() % 8;
+			cloudRect = { rand() % 1700, rand() % 500 + 300, cloudsSurface[randomCloud]->w, cloudsSurface[randomCloud]->h };
+			SDL_BlitSurface(cloudsSurface[randomCloud], nullptr, atmosphereSurface, &cloudRect);
+		}
+		ResourceManager::AddResource("atmosphereT", new Texture(Application::GetInstance()->loadTexture(atmosphereSurface)));
 
-		
-		//fcam = new FlyingCamera({ 0.0, 1.0, 0.0 }, { 0.0,10.0,0.0 }, { 10.0, 0.0, 0.0 });
-		//cam = new StaticCamera({ 0.0, 1.0, 0.0 }, { 5.0, 30.0, 0.0 }, { 0.0, 0.0, 0.0 });
-		//fcam = new FlyingCamera({ 0.0, 1.0, 0.0 }, { 150 * RATIO,10.0,0.0 }, { 0.0, 0.0, 0.0 });
-		//cam = new StaticCamera({ 0.0, 1.0, 0.0 }, { 5.0, 30.0, 0.0 }, { 0.0, 0.0, 0.0 });
-		// cam = new StaticCamera({ 0.0,1.0,0.0 }, { 10.0,0.0,0.0 }, { 2.0, 0.0, 0.0 });
-		
+		// Libération des nuages
+		for (unsigned char i = 0; i < 8; i++)
+			SDL_FreeSurface(cloudsSurface[i]);
+		SDL_FreeSurface(atmosphereSurface);
+
+		atmosphere_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("atmosphereM"), *ResourceManager::GetResource<unsigned int*>("atmosphereT"));
+
 		//bug = new Sprite3Ddrawable(ResourceManager::GetResource<Sprite3D*>("bugSprite"), *ResourceManager::GetResource<unsigned int*>("shell"));
-		fcam = new FlyingCamera({ 0.0, 1.0, 0.0 }, { 10.0, 10.0, 10.0 }, { 0.0, 0.0, 0.0 });
 		
-		atmosphere_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("atmosphereM"), *ResourceManager::GetResource<unsigned int*>("atmosphere"));
+		charac = new Character(ResourceManager::GetResource<Sprite3D*>("bugSprite"), *ResourceManager::GetResource<unsigned int*>("shell"));
 
-		charac = new Character(ResourceManager::GetResource<TexturedMesh*>("bugModel"), *ResourceManager::GetResource<unsigned int*>("shell"));
-		charac->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		charac->Translate({ 0.0,1.0 * RATIO,0.0 });
-		charac->SetPosition(Vector3d(0.0, 7.0 * RATIO, 0.0) + charac->GetPosition().GetOrigin());
+		Matrix44d matrix;
+		matrix.LoadIdentity();
+		matrix.Translate({ 0.0,1.0 * RATIO,0.0 });
+		charac->Transform(matrix);
+		// charac->SetPosition(Vector3d(0.0, 7.0 * RATIO, 0.0) + charac->GetPosition().GetOrigin());
+		charac->SetPosition(Vector3d(0.0, 1.0 * RATIO, 0.0) + charac->GetPosition().GetOrigin());
+		//bug->Transform(matrix);
+		//bug->SetDelay(0.1);
+		debugHud_->AddDebug(charac, charac->GetSpeed());
+		SubscribeEvent(SDL_MOUSEBUTTONDOWN, debugHud_);
+		SubscribeEvent(SDL_MOUSEBUTTONUP, debugHud_);
+		SubscribeEvent(SDL_MOUSEMOTION, debugHud_);
+		SubscribeEvent(SDL_KEYDOWN, debugHud_);
 
-		//debugHud_->AddDebug(charac, charac->GetSpeed());
+		//quiz_ = new Quiz();
+		//SubscribeEvent(SDL_KEYDOWN, quiz_);
+		//SubscribeEvent(SDL_KEYUP, quiz_);
 
+		checkpoints_ = new Checkpoints();
+
+		camType = Dynamic;
 		dcam = new DynamicCamera(charac);
+		fcam = new FlyingCamera({ 0.0, 1.0, 0.0 }, { 10.0, 10.0, 10.0 }, { 0.0, 0.0, 0.0 });
+		SubscribeEvent(SDL_MOUSEMOTION, charac);
+		SubscribeEvent(771, charac);
+		SubscribeEvent(SDL_KEYUP, charac);
 
-		plateforme1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("surfacePlane"));
-		
-		plateformemouv1_ = new PlateformeMouvantes(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("surfacePlane"), { 0.0,0.0,1.0 }, 20 * RATIO,10.0);
+		PlateformeStatique* plateforme1 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("surfacePlane"));
+		plateformes_.push_back(plateforme1);
+
+		plateformemouv1_ = new PlateformeMouvantes(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("surfacePlane"), { 0.0,0.0,1.0 }, 20 * RATIO,2.0);
 		plateformemouv1_->Translate({ -4.0 * RATIO,0.0,-10.0* RATIO });
-
-		couloirporte1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirporte1_->Translate({ 4.0 * RATIO,0.0,0.0 });
-
-		couloirporte2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirporte2_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirporte2_->Translate({ 11.0 * RATIO,0.0,0.0 });
-		
-		couloirporte3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirporte3_->Translate({ 18.0 * RATIO,0.0,0.0 });
-
-		couloirporte4_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirporte4_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirporte4_->Translate({ 25.0 * RATIO,0.0,0.0 });
-
-		couloirporte5_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirporte5_->Translate({ 32.0 * RATIO,0.0,0.0 });
-
-		couloirporte6_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirporte6_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirporte6_->Translate({ 39 * RATIO,0.0,0.0 });
-
-
-		plateformeCheckpoint1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		plateformeCheckpoint1_->Translate({ 46.0 * RATIO,0.0,0.0 });
-
-		checkpointPillier1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("checkpointPillierM"), *ResourceManager::GetResource<unsigned int*>("checkpointPillier"));
-		checkpointPillier1_->Translate({ 46.5 * RATIO,0.5 * RATIO,0.0 });
-
-		checkpointFlag1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("checkpointFlagM"), *ResourceManager::GetResource<unsigned int*>("checkpointBaseFlag"));
-		checkpointFlag1_->Translate({ 46.5 * RATIO,0.5 * RATIO,0.0 });
-	
-
-		couloirVentilateur1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirVentilateur1_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirVentilateur1_->Translate({ 53.0 * RATIO,0.0,0.0 });
-
-		couloirVentilateur2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirVentilateur2_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirVentilateur2_->Translate({ 63.0 * RATIO,0.0,0.0 });
-		
-		couloirVentilateur3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirVentilateur3_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirVentilateur3_->Translate({ 73.0 * RATIO,0.0,0.0 });
 		
 
-		Ventilateur1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("ventilateurM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		Ventilateur1_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		Ventilateur1_->Translate({ 55.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+		//plateformeintermittente_ = new PlateformeIntermittente(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("surfacePlane"));
+		//plateformeintermittente_->Translate({ -4.0 * RATIO,0.0,0.0 * RATIO });
 
-		Ventilateur2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("ventilateurM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		Ventilateur2_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		Ventilateur2_->Translate({ 63.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+		trampoline_ = new Trampoline(ResourceManager::GetResource<TexturedMesh*>("trampoline"), *ResourceManager::GetResource<unsigned int*>("surfacePlane"));
+		trampoline_->Scale({ 5.0,5.0,5.0 });
+		trampoline_->Translate({ -7.0 * RATIO,0.0,0.0 * RATIO });
+		
 
-		Ventilateur3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("ventilateurM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		Ventilateur3_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);		
-		Ventilateur3_->Translate({ 71.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+		PlateformeStatique* couloirporte1 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirporte1->Translate({ 4.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirporte1);
+
+		PlateformeStatique* couloirporte2 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirporte2->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirporte2->Translate({ 11.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirporte2);
+		
+		PlateformeStatique* couloirporte3 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirporte3->Translate({ 18.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirporte3);
+
+		PlateformeStatique* couloirporte4 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirporte4->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirporte4->Translate({ 25.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirporte4);
+
+		PlateformeStatique* couloirporte5 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirporte5->Translate({ 32.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirporte5);
+
+		PlateformeStatique* couloirporte6 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirporte6->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirporte6->Translate({ 39 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirporte6);
+
+		PlateformeStatique* plateformeCheckpoint1 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		plateformeCheckpoint1->Translate({ 46.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(plateformeCheckpoint1);
+
+		PlateformeStatique* couloirVentilateur1 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirVentilateur1->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirVentilateur1->Translate({ 53.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirVentilateur1);
+
+		PlateformeStatique* couloirVentilateur2 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirVentilateur2->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirVentilateur2->Translate({ 63.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirVentilateur2);
+		
+		PlateformeStatique* couloirVentilateur3 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirVentilateur3->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirVentilateur3->Translate({ 73.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirVentilateur3);
+		
+		Ventilateur1_ = new Ventilateur(ResourceManager::GetResource<TexturedMesh*>("ventilateurM"), *ResourceManager::GetResource<unsigned int*>("couloir"), { 56.0*RATIO,2.5*RATIO,5.0*RATIO });
+		Matrix44d rotMatrix;
+		rotMatrix.LoadIdentity();
+		rotMatrix.LoadTransformationOrigin(Ventilateur1_->GetPosition().GetOrigin());
+		rotMatrix.LoadRotation({ 0.0,1.0,0.0 }, DEMIPI);
+		Ventilateur1_->Transform(rotMatrix);
+		Ventilateur1_->SetXDirection({ 0.0,0.0,1.0 });
+		
+		//Ventilateur1_->Translate({ 56.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+		
+		Ventilateur2_ = new Ventilateur(ResourceManager::GetResource<TexturedMesh*>("ventilateurM"), *ResourceManager::GetResource<unsigned int*>("couloir"), { 63.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+		rotMatrix.LoadIdentity();
+		rotMatrix.LoadTransformationOrigin(Ventilateur2_->GetPosition().GetOrigin());
+		rotMatrix.LoadRotation({ 0.0,1.0,0.0 }, DEMIPI);
+		Ventilateur2_->Transform(rotMatrix);
+		Ventilateur2_->SetXDirection({ 0.0,0.0,1.0 });
+
+		Ventilateur3_ = new Ventilateur(ResourceManager::GetResource<TexturedMesh*>("ventilateurM"), *ResourceManager::GetResource<unsigned int*>("couloir"), { 70.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+		rotMatrix.LoadIdentity();
+		rotMatrix.LoadTransformationOrigin(Ventilateur3_->GetPosition().GetOrigin());
+		rotMatrix.LoadRotation({ 0.0,1.0,0.0 }, DEMIPI);
+		Ventilateur3_->Transform(rotMatrix);
+		Ventilateur3_->SetXDirection({ 0.0,0.0,1.0 });
 
 
-		plateformejump1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("surfacePlaneM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		plateformejump1_->Translate({ 82.0 * RATIO,0.0,-3.0 * RATIO });
+		aimant1_= new Aimant(ResourceManager::GetResource<TexturedMesh*>("magnetM"), *ResourceManager::GetResource<unsigned int*>("magnetT"), { 10.0 * RATIO,2 * RATIO,5.0 * RATIO });
+		rotMatrix.LoadIdentity();
+		rotMatrix.LoadTransformationOrigin(aimant1_->GetPosition().GetOrigin());
+		rotMatrix.LoadRotation({ 0.0,1.0,0.0 }, M_PI);
+		aimant1_->Transform(rotMatrix);
+		aimant1_->SetXDirection({ 0.0,0.0,1.0 });
 
-		plateformejump2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		plateformejump2_->Translate({ 88.0 * RATIO,0.0,2.0 * RATIO });
+		PlateformeStatique* plateformejump1 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("surfacePlaneM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		plateformejump1->Translate({ 82.0 * RATIO,0.0,-3.0 * RATIO });
+		plateformes_.push_back(plateformejump1);
 
-		plateformejump3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		plateformejump3_->Translate({ 95.0 * RATIO,0.0,0.0 * RATIO });
+		PlateformeStatique* plateformejump2 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		plateformejump2->Translate({ 88.0 * RATIO,0.0,2.0 * RATIO });
+		plateformes_.push_back(plateformejump2);
 
+		PlateformeStatique* plateformejump3 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		plateformejump3->Translate({ 95.0 * RATIO,0.0,0.0 * RATIO });
+		plateformes_.push_back(plateformejump3);
 
-		couloirParkour1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirParkour1_->Rotate({ 0.0,0.0,1.0 }, DEMIPI);
-		couloirParkour1_->Translate({ 97.5 * RATIO,-1.5 * RATIO,4.0 * RATIO });
+		PlateformeStatique* couloirParkour1 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirParkour1->Rotate({ 0.0,0.0,1.0 }, DEMIPI);
+		couloirParkour1->Translate({ 97.5 * RATIO,-1.5 * RATIO,4.0 * RATIO });
+		plateformes_.push_back(couloirParkour1);
 
-		plateformeParkour1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		plateformeParkour1_->Rotate({ 0.0,0.0,1.0 }, DEMIPI);
-		plateformeParkour1_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		plateformeParkour1_->Translate({ 100.0 * RATIO,-1.5 * RATIO,8.5 * RATIO });
+		PlateformeStatique* plateformeParkour1 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		plateformeParkour1->Rotate({ 0.0,0.0,1.0 }, DEMIPI);
+		plateformeParkour1->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		plateformeParkour1->Translate({ 100.0 * RATIO,-1.5 * RATIO,8.5 * RATIO });
+		plateformes_.push_back(plateformeParkour1);
 
-		couloirParkour2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirParkour2_->Rotate({ 0.0,0.0,1.0 }, DEMIPI);
-		couloirParkour2_->Translate({ 102.5 * RATIO,-1.5 * RATIO,4.0 * RATIO });
+		PlateformeStatique* couloirParkour2 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirParkour2->Rotate({ 0.0,0.0,1.0 }, DEMIPI);
+		couloirParkour2->Translate({ 102.5 * RATIO,-1.5 * RATIO,4.0 * RATIO });
+		plateformes_.push_back(couloirParkour2);
 
-		couloirParkour3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirParkour3_->Rotate({ 0.0,0.0,1.0 }, DEMIPI);
-		couloirParkour3_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirParkour3_->Translate({ 108.0 * RATIO,-1.5 * RATIO,0.0});
+		PlateformeStatique* couloirParkour3 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirParkour3->Rotate({ 0.0,0.0,1.0 }, DEMIPI);
+		couloirParkour3->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirParkour3->Translate({ 108.0 * RATIO,-1.5 * RATIO,0.0});
+		plateformes_.push_back(couloirParkour3);
 
+		PlateformeStatique* couloirCheckpoint2 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirCheckpoint2->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirCheckpoint2->Translate({ 118.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirCheckpoint2);
 
-		couloirCheckpoint2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirCheckpoint2_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirCheckpoint2_->Translate({ 118.0 * RATIO,0.0,0.0 });
+		PlateformeStatique* couloirpendule1 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirpendule1->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirpendule1->Translate({ 128.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirpendule1);
 
-		checkpointPillier2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("checkpointPillierM"), *ResourceManager::GetResource<unsigned int*>("checkpointPillier"));
-		checkpointPillier2_->Translate({ 118.0 * RATIO,0.5 * RATIO,0.0 });
+		PlateformeStatique* couloirpendule2 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirpendule2->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirpendule2->Translate({ 138.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirpendule2);
 
-		checkpointFlag2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("checkpointFlagM"), *ResourceManager::GetResource<unsigned int*>("checkpointBaseFlag"));
-		checkpointFlag2_->Translate({ 118.0 * RATIO,0.5 * RATIO,0.0 });
+		PlateformeStatique* couloirpendule3 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirpendule3->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirpendule3->Translate({ 148.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(couloirpendule3);
 
-
-		couloirpendule1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirpendule1_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirpendule1_->Translate({ 128.0 * RATIO,0.0,0.0 });
-
-		couloirpendule2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirpendule2_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirpendule2_->Translate({ 138.0 * RATIO,0.0,0.0 });
-
-		couloirpendule3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirpendule3_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirpendule3_->Translate({ 148.0 * RATIO,0.0,0.0 });
-
-		pendule1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("penduleM"), *ResourceManager::GetResource<unsigned int*>("pendule"));
+		pendule1_ = new Objet3dColisionable(ResourceManager::GetResource<TexturedMesh*>("penduleM"), *ResourceManager::GetResource<unsigned int*>("pendule"));
 		pendule1_->Rotate({ 0.0,0.0,1.0 }, -DEMIPI);
 		pendule1_->Translate({ 125.0 * RATIO,5.5 * RATIO,4.5 * RATIO });
 
@@ -273,85 +364,159 @@ public:
 		pendule3_->Rotate({ 0.0,0.0,1.0 }, -DEMIPI);
 		pendule3_->Translate({ 145.0 * RATIO,5.5 * RATIO,4.5 * RATIO });
 
-		plateformeMouvante1_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		plateformeMouvante1_->Translate({ 156.0 * RATIO,0.0,0.0 });
+		PlateformeStatique* plateformeMouvante1 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		plateformeMouvante1->Translate({ 156.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(plateformeMouvante1);
 
-		plateformeMouvante2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		plateformeMouvante2_->Translate({ 161.0 * RATIO,0.0,0.0 });
+		PlateformeStatique* plateformeMouvante2 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		plateformeMouvante2->Translate({ 161.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(plateformeMouvante2);
 
-		plateformeMouvante3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		plateformeMouvante3_->Translate({ 166.0 * RATIO,0.0,0.0 });
+		PlateformeStatique* plateformeMouvante3 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		plateformeMouvante3->Translate({ 166.0 * RATIO,0.0,0.0 });
+		plateformes_.push_back(plateformeMouvante3);
 
+		PlateformeStatique* couloirCheckpoint3 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		couloirCheckpoint3->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		couloirCheckpoint3->Translate({ 174.0 * RATIO, 0.0, 0.0 });
+		plateformes_.push_back(couloirCheckpoint3);
 
-		couloirCheckpoint3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("couloirM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
-		couloirCheckpoint3_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		couloirCheckpoint3_->Translate({ 174.0 * RATIO, 0.0, 0.0 });
-
-		checkpointPillier3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("checkpointPillierM"), *ResourceManager::GetResource<unsigned int*>("checkpointPillier"));
-		checkpointPillier3_->Translate({ 172.0 * RATIO, 0.5 * RATIO, 0.0 });
-
-		checkpointFlag3_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("checkpointFlagM"), *ResourceManager::GetResource<unsigned int*>("checkpointBaseFlag"));
-		checkpointFlag3_->Translate({ 172.0 * RATIO, 0.5 * RATIO, 0.0 });
-
-		labyrinthe_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("labyrintheM"), *ResourceManager::GetResource<unsigned int*>("labyrinthe"));
+		labyrinthe_ = new Labyrinthe();
 		//labyrinthe_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		labyrinthe_->Translate({ 178 * RATIO, 0.0 * RATIO, 4.0 * RATIO });
+		labyrinthe_->Rotate({0.0, 1.0, 0.0}, -DEMIPI);
+		labyrinthe_->Translate({ 267.0 * RATIO, 0.0 * RATIO, 35.0 * RATIO });
+		// charac->SetPosition({ 267.0 * RATIO, RATIO, 35.0 * RATIO });
+		// charac->Translate({ 267.0 * RATIO, RATIO, 35.0 * RATIO });
+		// dcam = new DynamicCamera(charac);
 
-		pisteGlissante_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("pisteM"), *ResourceManager::GetResource<unsigned int*>("pisteGlissante"));
-		pisteGlissante_->Rotate({ 1.0,0.0,0.0 }, DEMIPI);
-		pisteGlissante_->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
-		pisteGlissante_->Translate({ 181 * RATIO, 0.0 * RATIO, 0.0 });
+		PlateformeStatique* pisteGlissante = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("pisteM"), *ResourceManager::GetResource<unsigned int*>("pisteGlissante"));
+		pisteGlissante->Rotate({ 1.0,0.0,0.0 }, DEMIPI);
+		pisteGlissante->Rotate({ 0.0,1.0,0.0 }, DEMIPI);
+		pisteGlissante->Translate({ 181 * RATIO, 0.0 * RATIO, 0.0 });
+		plateformes_.push_back(pisteGlissante);
 		
+
 		plateformeMouvante2_ = new Objet3dDrawable(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
 		plateformeMouvante2_->Translate({ 161.0 * RATIO,0.0,0.0 });
 
-		
-
+		/*Capsule* capSpeed_ = new SpeedCapsule(ResourceManager::GetResource<TexturedMesh*>("capsuleM"), *ResourceManager::GetResource<unsigned int*>("capsuleT"), 10.0, 1.5);
+		capSpeed_->SetOrigin({ 5 * RATIO, 1.0 * RATIO, 0.0 });
+		capSpeed_->Translate({ 5 * RATIO, 1.0 * RATIO, 0.0 });
+		capsules_.push_back(capSpeed_);
+		Capsule* capJump_ = new JumpCapsule(ResourceManager::GetResource<TexturedMesh*>("capsuleM"), *ResourceManager::GetResource<unsigned int*>("capsuleT"), 10.0, 5.0);
+		capJump_->SetOrigin({ 10 * RATIO, 1.0 * RATIO, 0.0 });
+		capJump_->Translate({ 10 * RATIO, 1.0 * RATIO, 0.0 });
+		capsules_.push_back(capJump_);
+		*/
+		Capsule* capTP_ = new TeleportationCapsule(ResourceManager::GetResource<TexturedMesh*>("capsuleM"), *ResourceManager::GetResource<unsigned int*>("capsuleT"), { 20 * RATIO, 1.0 * RATIO, 0.0 });
+		capTP_->SetOrigin({ 5 * RATIO, 2.0 * RATIO, 0.0 });
+		capTP_->Translate({ 5 * RATIO, 2.0 * RATIO, 0.0 });
+		capsules_.push_back(capTP_);
+		// PlateformeStatique* plateformeMouvante2 = new PlateformeStatique(ResourceManager::GetResource<TexturedMesh*>("plateformeM"), *ResourceManager::GetResource<unsigned int*>("couloir"));
+		// plateformeMouvante2->Translate({ 161.0 * RATIO,0.0,0.0 });
+		// plateformes_.push_back(plateformeMouvante2);
 	}
 
-	///\brief �venements
-	///\param sdlEvent �venement � g�rer
+	///\brief Gestion d'événement
+	///\param sdlEvent Événement à gérer
 	void HandleEvent(SDL_Event sdlEvent) {
-		//fcam->Notification(sdlEvent);
-		//charac->Notification(sdlEvent);
-		// debugHud_->Notification(sdlEvent);
-		fcam->Notification(sdlEvent);
-		//charac->Notification(sdlEvent);
-		//debugHud_->Notification(sdlEvent);
+		if (eventDispatcher_.find(sdlEvent.type) != eventDispatcher_.end())
+			eventDispatcher_[sdlEvent.type]->Notify(sdlEvent);						
+
+		if (sdlEvent.type == SDL_KEYUP)
+			switch (sdlEvent.key.keysym.sym) {
+			case '1':
+				if (camType == Flying) {
+					UnsubscribeEvent(SDL_MOUSEMOTION, fcam);
+					UnsubscribeEvent(771, fcam);
+					UnsubscribeEvent(SDL_KEYUP, fcam);
+
+					SubscribeEvent(SDL_MOUSEMOTION, charac);
+					SubscribeEvent(771, charac);
+					SubscribeEvent(SDL_KEYUP, charac);
+					camType = Dynamic;
+				}
+				break;
+			case '2':
+				if (camType == Dynamic) {
+					
+					UnsubscribeEvent(SDL_MOUSEMOTION, charac);
+					UnsubscribeEvent(771, charac);
+					UnsubscribeEvent(SDL_KEYUP, charac);
+
+					SubscribeEvent(SDL_MOUSEMOTION, fcam);
+					SubscribeEvent(771, fcam);
+					SubscribeEvent(SDL_KEYUP, fcam);
+					camType = Flying;
+				}
+				break;
+			}
 	}
 
 	///\brief G�rer les modifications
 	///\param deltaTime temps �coul� depuis le dernier appel de cette fonction
-	void HandleUpdate(double deltaTime) {
-		//dcam->Move(deltaTime);
-		
-		fcam->Move(deltaTime);
-		//charac->HandleUpdate(deltaTime);
+	void HandleUpdate(double deltaTime) {	
+		//bug->UpdateFrame(deltaTime);
 
-		/*
-		animtime_ += deltaTime;
-		if (animtime_ > 0.01) {
-			bug->SetNextFrame();
-			animtime_ = 0;
+		bool r;
+		for (auto it : plateformes_) {
+			r = it->CollisionWithPlatform(charac);
+			if (r) {
+				break;
+			}
 		}
-		*/
+
+		r = r || labyrinthe_->CollisionWithPlatform(charac);
+		if (r == false) {
+			charac->SetJump(true);
+		}
+
+		EffectManager::ExpirationTest();
+
+		for (auto it : capsules_) {
+			it->Collision(charac);
+		}
+
+		switch (camType) {
+		case Dynamic:
+			dcam->Move(deltaTime);
+			break;
+
+		case Flying:
+			fcam->Move(deltaTime);
+		}
+
+		checkpoints_->HandleUpdate(charac);	
+
+		//charac->UpdateFrame(deltaTime);
+		charac->HandleUpdate(deltaTime);
+		//Ventilateur1_->HandleUpdate(deltaTime);
+		//Ventilateur1_->Translate({ -55.0 * RATIO,-2.5 * RATIO,-5.0 * RATIO });
+		plateformemouv1_->SetCharacter(charac);
+		plateformemouv1_->HandleUpdate(deltaTime);
 		
 
-		Ventilateur1_->Translate({ -55.0 * RATIO,-2.5 * RATIO,-5.0 * RATIO });
-		Ventilateur2_->Translate({ -63.0 * RATIO,-2.5 * RATIO,-5.0 * RATIO });
-		Ventilateur3_->Translate({ -71.0 * RATIO,-2.5 * RATIO,-5.0 * RATIO });
+		aimant1_->CheckEffect(charac,deltaTime);
 
-		Ventilateur1_->Rotate({ 0.0, 0.0, 1.0 }, deltaTime*15);
-		Ventilateur2_->Rotate({ 0.0, 0.0, 1.0 }, deltaTime*15);
-		Ventilateur3_->Rotate({ 0.0, 0.0, 1.0 }, deltaTime*15);
+		Ventilateur1_->HandleUpdate(deltaTime);
+		Ventilateur1_->CheckEffect(charac, deltaTime);
+		Ventilateur2_->HandleUpdate(deltaTime);
+		Ventilateur2_->CheckEffect(charac, deltaTime);
+		Ventilateur3_->HandleUpdate(deltaTime);
+		Ventilateur3_->CheckEffect(charac, deltaTime);
+		//Ventilateur1_->Translate({ -55.0 * RATIO,-2.5 * RATIO,-5.0 * RATIO });
+		//Ventilateur2_->Translate({ -63.0 * RATIO,-2.5 * RATIO,-5.0 * RATIO });
+		//Ventilateur3_->Translate({ -71.0 * RATIO,-2.5 * RATIO,-5.0 * RATIO });
 
-		Ventilateur1_->Translate({ 55.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
-		Ventilateur2_->Translate({ 63.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
-		Ventilateur3_->Translate({ 71.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+		//Ventilateur1_->Rotate({ 0.0, 0.0, 1.0 }, deltaTime*15);
+		//Ventilateur2_->Rotate({ 0.0, 0.0, 1.0 }, deltaTime*15);
+		//Ventilateur3_->Rotate({ 0.0, 0.0, 1.0 }, deltaTime*15);
 
-		//a mieux rotate
-		
-		
+		//Ventilateur1_->Translate({ 55.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+		//Ventilateur2_->Translate({ 63.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+		//Ventilateur3_->Translate({ 71.0 * RATIO,2.5 * RATIO,5.0 * RATIO });
+
+		// TODO: À mieux rotationer
 		pendule1_->Translate({ -125.0 * RATIO,-5.5 * RATIO,0.0 });
 		pendule2_->Translate({ -135.0 * RATIO,-5.5 * RATIO,0.0 });
 		pendule3_->Translate({ -145.0 * RATIO,-5.5 * RATIO,0.0 });
@@ -376,92 +541,84 @@ public:
 		pendule3_->Translate({ 145.0 * RATIO,5.5 * RATIO,0.0 });
 		
 		plateformemouv1_->HandleUpdate(deltaTime);
+		//plateformeintermittente_->HandleUpdate(deltaTime);
+		//plateformeintermittente_->CollisionWithPlatform(charac);
+		trampoline_->HandleUpdate(deltaTime);
+		trampoline_->CollisionWithPlatform(charac);
 		// a translate les plateformes mouvantes
 
-		//debugHud_->HandleRefresh(deltaTime);
+		debugHud_->HandleRefresh(deltaTime);
+		//quiz_->HandleUpdate(deltaTime, charac);
 	}
 
 	///\brief affichage
 	void HandleRefresh() {
+		for (auto it : plateformes_) {
+			it->Draw();
+		}
+
+		for (auto it : capsules_) {
+			it->Draw();
+		}
+
 		//lead->Draw();
 		atmosphere_->Draw();
-		//bug->Draw();
 		charac->Draw();
-		plateforme1_->Draw();
-		couloirporte1_->Draw();
-		couloirporte2_->Draw();
-		couloirporte3_->Draw();
-		couloirporte4_->Draw();
-		couloirporte5_->Draw();
-		couloirporte6_->Draw();
-		plateformeCheckpoint1_->Draw();
-		checkpointPillier1_->Draw();
-		checkpointFlag1_->Draw();
-		couloirVentilateur1_->Draw();
-		couloirVentilateur2_->Draw();
-		couloirVentilateur3_->Draw();
+		aimant1_->Draw();
 		Ventilateur1_->Draw();
 		Ventilateur2_->Draw();
 		Ventilateur3_->Draw();
-		plateformejump1_->Draw();
-		plateformejump2_->Draw();
-		plateformejump3_->Draw();
-		couloirParkour1_->Draw();
-		plateformeParkour1_->Draw();
-		couloirParkour2_->Draw();
-		couloirParkour3_->Draw();
-		couloirCheckpoint2_->Draw();
-		checkpointPillier2_->Draw();
-		checkpointFlag2_->Draw();
-		couloirpendule1_->Draw();
-		couloirpendule2_->Draw();
-		couloirpendule3_->Draw();
 		pendule1_->Draw();
 		pendule2_->Draw();
 		pendule3_->Draw();
-		plateformeMouvante1_->Draw();
-		plateformeMouvante2_->Draw();
-		plateformeMouvante3_->Draw();
-		couloirCheckpoint3_->Draw();
-		checkpointPillier3_->Draw();
-		checkpointFlag3_->Draw();
+		trampoline_->HandleRefresh();
+		labyrinthe_->Draw();
+		
 
 		plateformemouv1_->Draw();
-		//labyrinthe_->Draw();
-		pisteGlissante_->Draw();
+		checkpoints_->Draw();
+		debugHud_->Draw3D();
 
-		//debugHud_->Draw();
-		//labyrinthe_->Draw();
-		//dcam->ApplyView();
-		//cam->ApplyView();
-		fcam->ApplyView();
+		// 2D rendering	
+		GlContext* w = dynamic_cast<GlContext*>(Application::GetInstance()->GetWindow());
+		if (w != nullptr && w->GetStatus() == _3D) {
+			glDisable(GL_LIGHTING);
+			glDisable(GL_LIGHT0);
+			glDisable(GL_DEPTH_TEST);
 
-		//dcam->ApplyView();
-		//cam->ApplyView();
-		//fcam->ApplyView();
-		//mesh->Draw();
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_NORMAL_ARRAY);
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+			w->SetDefaultPerspective(_2D);
+		}
+
+		debugHud_->Draw2D();
+		//quiz_->Draw();
+
+		if (w != nullptr && w->GetStatus() == _2D) {
+			glEnable(GL_LIGHTING);
+			glEnable(GL_LIGHT0);
+			glEnable(GL_DEPTH_TEST);
+
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_NORMAL_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+			w->SetDefaultPerspective(_3D);
+		}
+		// 2D rendering	
+
+		switch (camType) {
+		case Dynamic:
+			dcam->ApplyView();
+			break;
+
+		case Flying:
+			fcam->ApplyView();
+			break;
+		}
 	}
 };
 
-
 #endif
-
-//lead = new LeaderboardHud("Leaderboard.txt", font, { 255,0,0,255 }, { 300,200,0,0 },0,200);
-/*labeliste = new LabelList({ 500,0,0,0 }, 10);
-labeliste->AddLabel(new Label({ 500, 200,0,0 }, ttfFont, { 255,255,255,255 }, "Es hora de comer"));
-labeliste->AddLabel(new Label({ 500, 200,0,0 }, ttfFont, { 255,255,255,255 }, "Es hora de beber"));
-labeliste->AddLabel(new Label({ 500, 200,0,0 }, ttfFont, { 255,255,255,255 }, "Es hora de robar"));
-labeliste->AddLabel(new Label({ 500, 200,0,0 }, ttfFont, { 255,255,255,255 }, "Es hora de dormir"));
-labeliste->AddLabel(new Label({ 500, 200,0,0 }, ttfFont, { 255,255,255,255 }, "Es hora de hola"));*/
-//label = new Label({ 500, 200,0,0 }, font, { 0,0,255,255 }, "Es hora de comer");
-
-
-		/*glGenTextures(1, &meshtexid);
-		glBindTexture(GL_TEXTURE_2D, meshtexid);
-		SDL_Surface* texture = IMG_Load("cubesimpletex.png");
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->w, texture->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture->pixels);
-		SDL_FreeSurface(texture);*/
-
-		//mesh = new Objet3dDrawable("cubesimple.obj", meshtexid);

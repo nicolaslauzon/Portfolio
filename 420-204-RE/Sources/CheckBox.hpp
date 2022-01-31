@@ -36,8 +36,13 @@ public:
   ///\param width Largeur
   ///\param height Hauteur
   ColorCheckBox(const int& x, const int& y, const int& width, const int& height, const SDL_Color& backgroundColor, const SDL_Color& checkColor) : position(x, y), size(width, height) {
+    rect_ = { x, y, width, height };
     background = new RectFill({ position.x, position.y, size.x, size.y }, backgroundColor, 1);
     check = new RectFill({ position.x + 2, position.y + 2, size.x - 4, size.y - 4 }, checkColor, 2);
+  }
+
+  bool isChecked() {
+    return checked;
   }
 
   ///\brief Événement

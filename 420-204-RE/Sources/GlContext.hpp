@@ -87,7 +87,7 @@ class GlContext : public Window {
             SetPerspective(0.0, 1.0, -1.0, _2D);
         }
         else {
-            SetPerspective(89.0, 0.1, 5000.0, _3D);
+            SetPerspective(89.0, 0.1, 10000.0, _3D);
         }
     }
 

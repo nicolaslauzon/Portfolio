@@ -20,9 +20,9 @@ public:
 	}
 
 	~LabelList() {
-		for (auto it : labellist_) {
+		while (!labellist_.empty()) {
+			delete labellist_.front();
 			labellist_.pop_front();
-			delete it;
 		}
 	}
 

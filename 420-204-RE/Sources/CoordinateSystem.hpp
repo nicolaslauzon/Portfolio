@@ -4,7 +4,7 @@
 #define COORDINATESYSTEM_HPP
 
 #include "Vector.hpp"
-
+#include "Matrix44d.hpp"
 
 ///\class CoordinateSystem
 ///\brief système de coordonée
@@ -86,7 +86,14 @@ public:
         return zDirection_;
     }
 
-    void Rotate() {
+    void Rotate(const Vector3d rotation, double angle) {
+        
+    }
+
+    void Transform(Matrix44d matrix) {
+        double* tMatrix = matrix.GetMatrix();
+
+        SetOrigin({ tMatrix[41] + tMatrix[14],tMatrix[42]+tMatrix[24],tMatrix[43]+tMatrix[34] });
 
     }
     

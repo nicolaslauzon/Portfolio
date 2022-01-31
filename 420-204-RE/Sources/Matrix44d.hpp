@@ -133,7 +133,7 @@ public:
         m33 = c + w2 * _1_c;
         m34 = 0.;
 
-        m41 = m42 = m43 = 0.;
+        //m41 = m42 = m43 = 0.;
         m44 = 1.;       
     }
 
@@ -190,6 +190,15 @@ public:
         return matrix_;
     }
 
+    ///\brief Retourne la ligne de translation
+    inline Vector3d GetTranslation() {
+        return { m14,m24,m34 };
+    }
+
+    ///\brief Retourne la ligne de l'origine
+    inline Vector3d GetOrigin() {
+        return { m41,m42,m43 };
+    }
 
     ///\brief Multiplication de la matrice par un vecteur
     ///\param v Vecteur3d

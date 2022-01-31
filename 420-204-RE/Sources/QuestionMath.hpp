@@ -24,16 +24,13 @@ class QuestionMath
 private:
     static unsigned int operandeQuantity_; ///< Quantité de chiffres dans l'équation
 
-    ///\brief default constructor
-    QuestionMath() {  }
-
         ///\brief Ajoute une operation a la fin de l'équation
         ///\param currEquation equation
         ///\return nouvelle equation
         static string
         AddOperation(string currEquation)
     {
-        int newNumber = GenerateRandomInt(10);
+        int newNumber = GenerateRandomInt(9, 1);
         ++operandeQuantity_;
         string newOperator = GenerateRandomOperator();
         if (currEquation != "")
@@ -85,11 +82,15 @@ private:
     }
 
 public:
+    ///\brief default constructor
+    QuestionMath()=default;
+
     ///\brief génère un calcul mental
     ///\param complexity complexité de l'équation
     ///\return Le calcul mental et la réponse
     static const Question GenerateQuestion(unsigned int complexity)
     {
+        operandeQuantity_ = 0;
         string equation = "";
         bool nextIsOperation = false;
         for (int i = 0; i < complexity; ++i)

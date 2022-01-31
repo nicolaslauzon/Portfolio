@@ -8,7 +8,7 @@
 #include <list>
 #include <cstdio>
 
-int PriorityFromTokenType(c_Token::c_TokenTyoe token_type);
+int PriorityFromTokenType(c_Token::c_TokenType token_type);
 
 class Solver
 {
