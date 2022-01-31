@@ -3,7 +3,8 @@
 ## Introduction
 
 Voici un projet que j'ai fait dans le cadre de mon dernier cours de 
-programmation au cégep. C'est un travail d'équipe. Voici une petite partie 
+programmation au cégep. C'est un travail d'équipe. Dans la section 
+suivante, il y a une petite partie 
 de mes contributions au projet.
 
 ## Exemples de code que j'ai fait
@@ -27,9 +28,6 @@ Cela inclut les sous-classes utilisées dans les fichiers suivants.
 
 ### Éléments de gameplay
 * [Checkpoint](420-204-RE/Sources/Checkpoint.hpp)
-
-
-
 
 ## Contributeurs
 
