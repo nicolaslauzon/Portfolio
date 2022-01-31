@@ -1,0 +1,39 @@
+# Toujours commencer une ligne par un indicateur du type de la ressource : (T = Texture | F = Font | M = Modèle | S = Sprites | ...) Exemple : T Ballon Ballon.png
+C resourceCount resourceCount 35
+F font50 font.ttf 50
+T cursor normalPointer.png
+T menuBackground mainMenu.png
+T atmosphere atmosphere.png
+T couloir Couloir.png
+T surfacePlane SurfacePlane1.png
+T checkpointPillier checkpointPillier.png
+T checkpointBaseFlag checkpointBaseFlag.png
+T pendule Pendule.png
+T labyrinthe labyrinthe.png
+T shell shell.png
+T pisteGlissante Piste1c.png
+T resultats resultats.png
+T backgroundSceneControle sceneControl_background.png
+T debugSpeed.png debugSpeed.png
+T debugSphere.png debugSphere.png
+T debugCenterMass.png debugCenterMass.png
+T cubesimpletex cubesimpletex.png
+F font20 font.ttf 20
+M debugSpeed debugSpeed.obj
+M debugSphere debugSphere.obj
+M debugCenterMass debugCenterMass.obj
+M atmosphereM atmosphere.obj
+M plateformeM plateforme.obj
+M couloirM Couloir.obj
+M checkpointPillierM checkpointPillier.obj
+M checkpointFlagM checkpointFlag.obj
+M ventilateurM Ventilateur.obj
+M surfacePlaneM SurfacePlane.obj
+M penduleM Pendule.obj
+M labyrintheM labyrinthe.obj
+M pisteM Piste1c.obj
+M PlateformeIntermittente PlateformeIntermittente.obj
+M PlateformeTrouee PlateformeTrouee.obj
+M bugModel bug.obj
+S bugSprite bug-sprite_ 38
+

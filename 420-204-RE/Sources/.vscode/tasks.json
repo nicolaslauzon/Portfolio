@@ -1,0 +1,74 @@
+{
+  "tasks": [
+    {
+      "type": "cppbuild",
+      "label": "Build Linux",
+      "command": "g++",
+      "args": [
+        "-g",
+        "${file}",
+        "${fileDirname}/solver.cpp",
+        "${fileDirname}/token.cpp",
+        "${fileDirname}/tokeniser.cpp",
+        "${fileDirname}/tokensimplifier.cpp",
+        "${fileDirname}/tokenvalidity.cpp",
+        "-o",
+        "${fileDirname}/PI2021",
+        "-lGL",
+        "-lSDL2main",
+        "-lSDL2",
+        "-lSDL2_ttf",
+        "-lSDL2_image"
+      ],
+      "options": {
+        "cwd": "/usr/bin",
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Tâche générée par le débogueur."
+    },
+    {
+      "type": "cppbuild",
+      "label": "Build MinGW64",
+      "command": "C:/msys64/mingw64/bin/g++.exe",
+      "args": [
+        "-IC:/msys64/mingw64/include/SDL2",
+        "-Dmain=SDL_main",
+        "-g",
+        "${file}",
+        "${fileDirname}/solver.cpp",
+        "${fileDirname}/token.cpp",
+        "${fileDirname}/tokeniser.cpp",
+        "${fileDirname}/tokensimplifier.cpp",
+        "${fileDirname}/tokenvalidity.cpp",        
+        "-o",
+        "${fileDirname}/PI2021.exe",
+        "-LC:/msys64/mingw64/lib",
+        "-lmingw32",
+        "-lopengl32",
+        "-lSDL2main",
+        "-lSDL2",
+        "-lSDL2_ttf",
+        "-lSDL2_image",
+        "-mwindows"
+      ],
+      "options": {
+        "cwd": "C:/msys64/mingw64/bin",
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Tâche générée par le débogueur."
+    }    
+  ],
+  "version": "2.0.0"
+}

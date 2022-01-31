@@ -1,0 +1,132 @@
+Questions : 
+
+À quoi correspond l'élément Au dans le tableau périodique?
+Réponse : l'or
+
+À quoi correspond l'élément N dans le tableau périodique?
+Réponse : l'azote
+
+À quoi correspond l'élément Sn dans le tableau périodique?
+Réponse : l'étain
+
+Lequel des deux éléments fait partie de la famille des gaz inertes?
+Réponse : He, Ne, Ar, Kr, Xe, Rnm Og
+
+Lequel des deux éléments fait partie de la famille des alcalins?
+Réponse : Li, Na, K, Rb, Cs, Fr
+
+Lequel des deux éléments fait partie de la famille des alcalino-terreux?
+Réponse : Be, Mg, Ca, Sr, Ba, Ra
+
+Lequel des deux éléments fait partie de la famille des halogènes?
+Réponse : F, Cl, Br, I, At, Ts
+
+Quel est l'élément le plus léger ?
+Réponse : l'hydrogène
+
+Quel est la nationalité d'Aristote?
+Réponse : Grec
+
+Quel est la relation entre Platon et Aristote?
+Réponse : maître élève
+
+Qui a inventé le langage B?
+Réponse : Kenneth Thompson
+
+Comment nomme t-on le 18e siècle?
+Réponse : le siècle des lumières
+
+Qui est l'auteur de la théorie de la relativité?
+Réponse : Albert Einstein
+
+Qui est la première femme à avoir gagner le prix Nobel?
+Réponse : Marie Curie
+
+Qui a inventé le téléphone?
+Réponse : Alexander Graham Bell
+
+Quelle est la capitale du Canada?
+Réponse : Ottawa
+
+Quelle est la capitale de la Russie?
+Réponse : Moscou
+
+Quelle est la capitale de l'Inde?
+Réponse : New Delhi
+
+Quelle est la capitale du Danemark?
+Réponse : Copenhague
+
+Quelle est la capitale du Brésil?
+Réponse : Brasilia
+
+À environ combien s'élève la population mondiale?
+Réponse : 7,8 milliards
+
+Quel est le pays qui a la plus forte population?
+Réponse : Inde
+
+Quand commence la première guerre mondiale?
+Réponse : 1914
+
+Qui a mis le premier pied sur la Lune?
+Réponse : Neil Armstrong
+
+Qui a remporté la coupe du monde en 2018?
+Réponse: La France
+
+Lequel des deux est un verbe irrégulier? (Anglais)
+Réponse : 
+
+---Prog 
+Quelle est la valeur de : !(7 < 3 && 2 = (7 - 5)) 
+vrai 
+
+Est-ce que cette syntaxe est correcte en c++17? 
+int main() {
+    [](){};
+}
+
+-> Oui
+
+Est-ce que cette syntaxe est correcte en c++17?
+#include <map>
+
+int main() {
+    std::map<int, int> Map;
+    for (auto [first, second] : Map {
+    }
+}
+
+-> Oui
+
+Vrai ou faux: une classe est utilisable en C 
+faux 
+
+Un pointeur fait, dans l'ordre: 
+a) Allocation de l'espace mémoire, Appel du constructeur, Effacement d
+b) Allocation de l'espace mémoire, Retour de l'adresse mémoire, Appel 
+c) Retour de l'adresse mémoire, Allocation de l'espace mémoire, Efface
+d) Aucune de ces réponses 
+d) 
+
+---Autres 
+Vrai ou faux: la zone cible est une fréquences cardiaque à viser afin 
+faux 
+
+Lequel de ces philosophe est le plus ancien: 
+a) Platon 
+b) Kant 
+c) Socrate 
+d) Descartes 
+c) 
+
+Vrai ou faux: La phrase suivante est un chiasme: Il faut manger pour v
+vrai 
+
+Quelle est la forme du verbe swing au participe passé: 
+a) swang  
+b) swung 
+c) swinged 
+d) swing 
+b) 
